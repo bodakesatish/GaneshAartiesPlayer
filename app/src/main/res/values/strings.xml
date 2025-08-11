@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Ganesh Aarties</string>
+    <string name="notification_channel_name">MyMusic</string>
+    <string name="notification_channel_description">mymusicdesc</string>
 </resources>

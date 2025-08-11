@@ -2,6 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- General foreground service permission -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Specific foreground service permission for media playback (Required for targetSDK 34+) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <!-- For notifications on Android 13+ -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,13 +23,28 @@
         android:theme="@style/Theme.GaneshAarties">
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- 👇 YOUR MUSIC SERVICE DECLARATION 👇 -->
+        <!-- Make sure this matches your service class name -->
+        <!-- Required for MediaSessionService -->
+        <!-- Required for Android 10 (API 29) and above for foreground services -->
+        <!-- You can also add this if you plan to support legacy MediaBrowserServiceCompat clients -->
+        <!-- <action android:name="android.media.browse.MediaBrowserService"/> -->
+
+        <service
+            android:name=".MusicService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+           </intent-filter>
+        </service>
     </application>
 
 </manifest>
