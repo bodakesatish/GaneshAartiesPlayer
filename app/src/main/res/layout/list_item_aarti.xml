@@ -22,16 +22,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+
         <TextView
             android:id="@+id/textViewAartiTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:textAppearance="?attr/textAppearanceListItem"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/imageViewDragHandle"
             app:layout_constraintStart_toEndOf="@id/checkboxAarti"
             app:layout_constraintTop_toTopOf="parent"
+            android:textColor="?attr/myPrimaryTextColor"
             tools:text="Aarti Title Here" />
 
         <ImageView
@@ -41,10 +42,10 @@
             android:contentDescription="Drag to reorder"
             android:padding="8dp"
             android:src="@drawable/ic_drag_handle"
+            app:tint="?attr/myIconTintColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?android:attr/textColorSecondary" />
+            app:layout_constraintTop_toTopOf="parent"/>
         <!-- Create this drawable -->
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

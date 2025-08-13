@@ -41,12 +41,12 @@ class AartiViewModel : ViewModel() {
 
     private fun loadAarties() {
         _aartiesStateFlow.value = listOf(
-            AartiItem(1, "sukhakarta_dukhaharta", R.raw.sukhakarta_dukhaharta, isChecked = false),
-            AartiItem(2, "durge_durghat_bhari", R.raw.durge_durghat_bhari, isChecked = false),
-            AartiItem(3, "lavthavati_vikrala", R.raw.lavthavati_vikrala, isChecked = false),
-            AartiItem(4, "yuge_atthavis_vitthala", R.raw.yuge_atthavis_vitthala, isChecked = false),
-            AartiItem(5, "datta_aarti", R.raw.datta_aarti, isChecked = false),
-            AartiItem(6, "ghalin_lotangan_vandin_charan", R.raw.ghalin_lotangan_vandin_charan, isChecked = false)
+            AartiItem(1, R.string.sukhakarta_dukhaharta_title, R.raw.sukhakarta_dukhaharta, isChecked = false),
+            AartiItem(2, R.string.durge_durghat_bhari_title, R.raw.durge_durghat_bhari, isChecked = false),
+            AartiItem(3, R.string.lavthavati_vikrala_title, R.raw.lavthavati_vikrala, isChecked = false),
+            AartiItem(4, R.string.yuge_atthavis_vitthala_title, R.raw.yuge_atthavis_vitthala, isChecked = false),
+            AartiItem(5, R.string.datta_aarti_title, R.raw.datta_aarti, isChecked = false),
+            AartiItem(6, R.string.ghalin_lotangan_vandin_charan_title, R.raw.ghalin_lotangan_vandin_charan, isChecked = false)
         )//.onEach { it.isChecked = true } // Default to checked
         updatePlayerPlaylist()
     }

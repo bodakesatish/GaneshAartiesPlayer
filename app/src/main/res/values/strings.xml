@@ -1,5 +1,27 @@
 <resources>
-    <string name="app_name">Ganesh Aarties</string>
-    <string name="notification_channel_name">MyMusic</string>
-    <string name="notification_channel_description">mymusicdesc</string>
+
+        <string name="app_name">Ganesh Aarties Player</string>
+        <string name="no_aarti_selected">No Aarti Selected</string>
+        <string name="notification_channel_name">Music Playback</string>
+        <string name="notification_channel_description">Shows currently playing music</string>
+
+        <!-- Player Controls -->
+        <string name="play_button_description">Play</string>
+        <string name="pause_button_description">Pause</string>
+        <string name="next_button_description">Next Aarti</string>
+        <string name="previous_button_description">Previous Aarti</string>
+        <string name="volume_up_description">Volume Up</string>
+        <string name="volume_down_description">Volume Down</string>
+
+        <!-- Aarti Titles (Example - You might load these dynamically, but if any are static UI text) -->
+        <string name="sukhakarta_dukhaharta_title">Sukhakarta Dukhaharta</string>
+        <string name="durge_durghat_bhari_title">Durge Durghat Bhari</string>
+        <string name="lavthavati_vikrala_title">Lavthavati Vikrala</string>
+        <string name="yuge_atthavis_vitthala_title">Yuge Atthavis Vitthala</string>
+        <string name="datta_aarti_title">Datta Aarti</string>
+        <string name="ghalin_lotangan_vandin_charan_title">Ghalin Lotangan Vandin Charan</string>
+        <!-- ... add all other user-facing strings from your UI -->
+        <string name="change_language_menu_title">Change Language</string>
+        <string name="select_language_title">Select Language</string>
+        <string name="cancel">Cancel</string>
 </resources>

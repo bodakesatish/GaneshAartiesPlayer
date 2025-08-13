@@ -2,14 +2,20 @@ package com.bodakesatish.ganeshaarties
 // In AartiAdapter.kt
 
 import android.annotation.SuppressLint
+import android.app.UiModeManager
+import android.graphics.Color
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 // Ensure these imports are correct for your project structure
 import com.bodakesatish.ganeshaarties.databinding.ListItemAartiBinding
+import com.google.android.material.color.MaterialColors
 
 
 interface AartiItemListener {
@@ -21,6 +27,9 @@ class AartiAdapter(private val listener: AartiItemListener) :
     ListAdapter<AartiItem, AartiAdapter.AartiViewHolder>(AartiDiffCallback()) {
 
     private var interactionsEnabled = true // Default to enabled
+    private var currentlyPlayingItemId: Int? = null // To store the ID of the playing item
+    private var isActuallyPlaying: Boolean = false // To know if playback is active
+
 
     @SuppressLint("NotifyDataSetChanged") // See note below
     fun setInteractionsEnabled(enabled: Boolean) {
@@ -35,6 +44,20 @@ class AartiAdapter(private val listener: AartiItemListener) :
         }
     }
 
+    // New method to update playing item info
+    @SuppressLint("NotifyDataSetChanged")
+    fun setPlayingState(playingItemId: Int?, isPlaying: Boolean) {
+        val changed = (currentlyPlayingItemId != playingItemId) || (this.isActuallyPlaying != isPlaying)
+        currentlyPlayingItemId = playingItemId
+        this.isActuallyPlaying = isPlaying
+        if (changed) {
+            // If the playing item or playing state changes, we need to refresh items
+            // to apply/remove the playing highlight.
+            notifyDataSetChanged() // This is simple; for optimization, diffing could be used
+            // or only rebind affected items.
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AartiViewHolder {
         val binding = ListItemAartiBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AartiViewHolder(binding)
@@ -43,28 +66,31 @@ class AartiAdapter(private val listener: AartiItemListener) :
     @SuppressLint("ClickableViewAccessibility")
     override fun onBindViewHolder(holder: AartiViewHolder, position: Int) {
         val aarti = getItem(position)
-        holder.bind(aarti, interactionsEnabled) // Pass the enabled state
+        // Pass aarti, interactionsEnabled, and whether this item is the one currently playing
+        holder.bind(
+            aarti,
+            interactionsEnabled,
+            isActuallyPlaying && aarti.id == currentlyPlayingItemId // isCurrentlyPlaying
+        )
 
-        // Update checkbox state visually (it won't have its own listener anymore)
         holder.binding.checkboxAarti.isChecked = aarti.isChecked
-        // Disable the checkbox itself from direct interaction if the whole item is clickable
-        holder.binding.checkboxAarti.isEnabled = false // Or you could hide it: holder.binding.checkboxAarti.visibility = View.GONE
+        holder.binding.checkboxAarti.isEnabled = false // Keep checkbox non-interactive directly
 
-        // Item click listener to toggle the checked state
         if (interactionsEnabled) {
             holder.itemView.setOnClickListener {
-                // When the item is clicked, notify the listener with the *new* toggled state
                 val newCheckedState = !aarti.isChecked
                 listener.onAartiToggled(aarti, newCheckedState)
             }
         } else {
+            // If interactions are disabled (e.g., during playback),
+            // clicking the item could potentially be used to play it if it's not the current one,
+            // or pause/play if it *is* the current one. This depends on desired UX.
+            // For now, let's keep it simple: no click listener if interactions are globally disabled.
             holder.itemView.setOnClickListener(null)
         }
 
-
-        // Drag handle interaction
-        holder.binding.imageViewDragHandle.isEnabled = interactionsEnabled // Visual cue
-        holder.binding.imageViewDragHandle.alpha = if (interactionsEnabled) 1.0f else 0.5f // Visual cue
+        holder.binding.imageViewDragHandle.isEnabled = interactionsEnabled
+        holder.binding.imageViewDragHandle.alpha = if (interactionsEnabled) 1.0f else 0.5f
         if (interactionsEnabled) {
             holder.binding.imageViewDragHandle.setOnTouchListener { _, event ->
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) {
@@ -78,10 +104,38 @@ class AartiAdapter(private val listener: AartiItemListener) :
     }
 
     inner class AartiViewHolder(val binding: ListItemAartiBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(aarti: AartiItem, isEnabled: Boolean) {
-            binding.textViewAartiTitle.text = aarti.title
-            // You can also adjust the appearance of the whole item if needed
-            itemView.alpha = if (isEnabled) 1.0f else 0.7f // Example: Dim the item
+        fun bind(aarti: AartiItem, isEnabledOverall: Boolean, isCurrentlyPlaying: Boolean) {
+            binding.textViewAartiTitle.setText(aarti.title)
+            itemView.alpha = if (isEnabledOverall || isCurrentlyPlaying) 1.0f else 0.7f // Dim non-interactive items, unless playing
+
+            val context = itemView.context
+            val typedValue = TypedValue()
+            // Apply highlighting based on state
+            when {
+                isCurrentlyPlaying -> {
+                    // Highlight for the currently playing item
+                  //  binding.textViewAartiTitle.setTextColor(ContextCompat.getColor(context, R.color.playing_text_color)) // Example
+//                    itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.playing_background_color)) // Example
+                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.myListItemPlayingTextColor, Color.BLACK))
+                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.myListItemPlayingBackgroundColor, Color.LTGRAY))
+
+                }
+                aarti.isChecked -> {
+                    // Highlight for selected (checked) items that are NOT currently playing
+                 //   binding.textViewAartiTitle.setTextColor(ContextCompat.getColor(context, R.color.selected_text_color)) // Example
+//                    itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.selected_background_color)) // Example
+                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.myListItemSelectedTextColor, Color.BLACK))
+                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.myListItemSelectedBackgroundColor, Color.DKGRAY))
+
+                }
+                else -> {
+                    // Default appearance for items that are neither playing nor selected
+                  //  binding.textViewAartiTitle.setTextColor(ContextCompat.getColor(context, R.color.default_text_color)) // Or your theme's default
+//                    itemView.setBackgroundColor(Color.TRANSPARENT) // Or your default item background
+                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.myListItemDefaultTextColor, Color.GRAY))
+                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.myListItemDefaultBackgroundColor, Color.WHITE))
+                }
+            }
         }
     }
 }
@@ -96,3 +150,32 @@ class AartiDiffCallback : DiffUtil.ItemCallback<AartiItem>() {
         return oldItem == newItem
     }
 }
+
+
+
+// Inside AartiAdapter.kt, AartiViewHolder's bind method
+//val context = itemView.context
+//if (isCurrentlyPlaying) {
+//    // For light/dark specific colors without theme attributes:
+//    val playingTextColor = ContextCompat.getColor(context, if (isSystemInDarkTheme()) R.color.list_item_playing_text_dark else R.color.list_item_playing_text_light)
+//    val playingBgColor = ContextCompat.getColor(context, if (isSystemInDarkTheme()) R.color.list_item_playing_background_dark else R.color.list_item_playing_background_light)
+//    binding.textViewAartiTitle.setTextColor(playingTextColor)
+//    binding.root.setBackgroundColor(playingBgColor)
+//} else if (aarti.isChecked) {
+//    val selectedTextColor = ContextCompat.getColor(context, if (isSystemInDarkTheme()) R.color.list_item_selected_text_dark else R.color.list_item_selected_text_light)
+//    val selectedBgColor = ContextCompat.getColor(context, if (isSystemInDarkTheme()) R.color.list_item_selected_background_dark else R.color.list_item_selected_background_light)
+//    binding.textViewAartiTitle.setTextColor(selectedTextColor)
+//    binding.root.setBackgroundColor(selectedBgColor)
+//} else {
+//    val defaultTextColor = ContextCompat.getColor(context, if (isSystemInDarkTheme()) R.color.list_item_default_text_dark else R.color.list_item_default_text_light)
+//    val defaultBgColor = ContextCompat.getColor(context, if (isSystemInDarkTheme()) R.color.list_item_default_background_dark else R.color.list_item_default_background_light)
+//    binding.textViewAartiTitle.setTextColor(defaultTextColor)
+//    binding.root.setBackgroundColor(defaultBgColor)
+//}
+//
+//// Helper to check current theme (put in a utility file or base activity if used often)
+//private fun isSystemInDarkTheme(): Boolean {
+//    // You might need to pass context or get it from itemView
+//    val uiModeManager = itemView.context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager
+//    return uiModeManager.nightMode == UiModeManager.MODE_NIGHT_YES
+//}

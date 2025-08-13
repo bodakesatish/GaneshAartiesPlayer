@@ -1,9 +1,49 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.GaneshAarties" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:ignore="NewApi">true</item>
+        <!-- ... other Material 3 color attributes for Dark Theme ... -->
+        <item name="colorPrimary">@color/orange_primary_dark_theme</item>
+        <item name="colorOnPrimary">@color/neutral_black</item>
+        <!-- ... other dark theme colors ... -->
+
+        <item name="android:colorBackground">@color/neutral_grey_dark_background</item>
+        <item name="colorOnBackground">@color/neutral_text_light_on_dark</item>
+
+        <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item>
+        <item name="popupTheme">@style/ThemeOverlay.Material3.Dark</item>
+
+        <!-- ... -->
+        <item name="myPrimaryTextColor">?attr/colorOnSurface</item>
+        <item name="myIconTintColor">?attr/colorOnSurfaceVariant</item>
+
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryDark</item>
+
+        <!-- Use Material 3's dedicated Toolbar style -->
+        <!-- For popup menus triggered from the Toolbar -->
+<!--        <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Toolbar.Surface</item>-->
+
+        <!-- Custom Attributes for your App (Dark Theme Specifics) -->
+        <!-- ... your custom dark theme attributes ... -->
+        <item name="myListItemPlayingBackgroundColor">@color/list_item_playing_background_dark</item>
+        <item name="myListItemPlayingTextColor">@color/list_item_playing_text_dark</item>
+        <!-- ... -->
+        <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Toolbar.Surface</item>
+
+        <!-- REMOVE or COMMENT OUT the old actionBarTheme and actionBarPopupTheme -->
+        <!--
+        <item name="actionBarTheme">@style/ThemeOverlay.Material3.ActionBar.Dark</item>
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
+        -->
+        <item name="myListItemSelectedBackgroundColor">@color/list_item_selected_background_light</item>
+
+        <item name="colorSurface">@color/neutral_grey_dark_background</item>
+        <item name="colorOnSurface">@color/neutral_text_light_on_dark</item>
+        <!-- You'd also need colorSurfaceVariant and colorOnSurfaceVariant defined for dark theme -->
+        <item name="myListItemDefaultTextColor">?attr/colorOnSurface</item>
+        <item name="myListItemDefaultBackgroundColor">?attr/colorSurface</item>
+        <!-- Custom Attributes for your App (Dark Theme Specifics) -->
+        <!-- You need to define these for the dark theme as well -->
+        <item name="myListItemBackgroundColor">?attr/colorSurface</item> <!-- This will correctly pick up the dark theme's colorSurface -->
+        <item name="myListItemSelectedTextColor">?attr/colorOnSurface</item>
+
     </style>
 </resources>

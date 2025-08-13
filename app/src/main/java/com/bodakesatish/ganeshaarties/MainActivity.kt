@@ -1,32 +1,37 @@
 package com.bodakesatish.ganeshaarties
 
-import android.app.Notification
-import android.app.PendingIntent
 import android.content.ComponentName
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.SeekBar
 import androidx.activity.viewModels
+import androidx.annotation.OptIn
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationCompat
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
+import androidx.core.os.LocaleListCompat
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bodakesatish.ganeshaarties.databinding.ActivityMainBinding
 import com.google.common.util.concurrent.ListenableFuture
-import com.bodakesatish.ganeshaarties.databinding.ActivityMainBinding // Generated binding class for activity_main
 import kotlinx.coroutines.launch
+import java.util.Locale
 import java.util.concurrent.TimeUnit
-import kotlin.collections.filter
 
 class MainActivity : AppCompatActivity(), AartiItemListener {
 
@@ -52,8 +57,17 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false) // Enable edge-to-edge
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Set up the Toolbar
+        val toolbar: Toolbar = binding.toolbar // If using ViewBinding
+        // Or: val toolbar: Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.title = getString(R.string.app_name) // Set your desired title
+
 
         setupRecyclerView()
         setupPlayerControls()
@@ -121,12 +135,10 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
 
         binding.playerControlsContainer.buttonNext.setOnClickListener {
             player?.seekToNextMediaItem()
-            // viewModel.onNextClicked()
         }
 
         binding.playerControlsContainer.buttonPrevious.setOnClickListener {
             player?.seekToPreviousMediaItem()
-            // viewModel.onPreviousClicked()
         }
 
         binding.playerControlsContainer.seekBarPlayer.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -147,6 +159,13 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
                 launch {
                     viewModel.aartiesStateFlow.collect { aartiList ->
                         aartiAdapter.submitList(aartiList)
+
+                        // Then, explicitly update the playing state based on the current playerUiState
+                        // This ensures that if the list updates, the playing highlight is reapplied correctly.
+                        val currentUiState = viewModel.playerUiState.value
+                        aartiAdapter.setPlayingState(currentUiState.currentAarti?.id, currentUiState.isPlaying)
+
+
                         // Only update the service's playlist. Don't auto-play here.
                         // The decision to play will be handled by play/pause button or
                         // if playback was already active.
@@ -159,8 +178,8 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
                 launch {
                     viewModel.playerUiState.collect { state ->
 
-                        binding.playerControlsContainer.textViewCurrentSong.text =
-                            state.currentAarti?.title ?: "No Aarti Selected"
+                        binding.playerControlsContainer.textViewCurrentSong.setText(
+                            state.currentAarti?.title ?: R.string.no_aarti_selected)
                         binding.playerControlsContainer.buttonPlayPause.setImageResource(
                             if (state.isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
                         )
@@ -174,12 +193,14 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
                         binding.playerControlsContainer.textViewCurrentTime.text = formatTime(state.currentPosition) // Will be 00:00
                         binding.playerControlsContainer.textViewTotalTime.text = formatTime(state.totalDuration)     // Will be 00:00
 
+                        // Update adapter's playing state
+                        aartiAdapter.setPlayingState(state.currentAarti?.id, state.isPlaying) // <--- ADD THIS
 
-                        val isPlaying = state.isPlaying
-                        // ... (button enable/disable states)
-                        aartiAdapter.setInteractionsEnabled(!isPlaying)
+                        // Enable/disable interactions based on playing state
+                        aartiAdapter.setInteractionsEnabled(!state.isPlaying)
 
-                        if (isPlaying) {
+
+                        if (state.isPlaying) {
                             startSeekBarUpdates()
                         } else {
                             stopSeekBarUpdates()
@@ -211,10 +232,8 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
                             position = currentPosition,
                             duration = duration
                         )
-                        // Schedule the next update
                         progressUpdateHandler.postDelayed(this, 500) // Update every 500ms
                     } else {
-                        // If player stopped playing for some other reason, update state one last time
                         viewModel.updatePlaybackState(
                             isPlaying = false,
                             currentAartiId = controller.currentMediaItem?.mediaId?.toIntOrNull(),
@@ -236,49 +255,30 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
     private fun updateServicePlaylist(playlist: List<AartiItem>) {
         player?.let { controller ->
             val mediaItems = playlist.map { aarti ->
-                val uri = Uri.parse("android.resource://${packageName}/${aarti.rawResourceId}")
+                val uri = "android.resource://${packageName}/${aarti.rawResourceId}".toUri()
                 androidx.media3.common.MediaItem.Builder()
                     .setUri(uri)
                     .setMediaId(aarti.id.toString())
                     .build()
             }
 
-            // Get the current state *before* setting new items
-            val currentPlayingMediaId = controller.currentMediaItem?.mediaId
-            val currentPosition = controller.currentPosition
-            val wasPlaying = controller.isPlaying // Important: check if it was playing
-
-            // Set media items. The `preserveConfiguration=true` is key.
-            // It tries to maintain the playback state (play/pause, current item if still present, position).
-            controller.setMediaItems(mediaItems, true) // `resetPosition` defaults to false, `playWhenReady` is preserved.
-
-            // After setting items, the controller might have intelligently handled things.
-            // For example, if the current item was removed and it was playing, it might stop or move to the next.
-
-            // If the playlist became empty, and it was playing, it should stop.
-            // The MediaController might do this automatically, but an explicit stop is safer.
+            val wasPlaying = controller.isPlaying
+            controller.setMediaItems(mediaItems, true)
             if (mediaItems.isEmpty() && wasPlaying) {
                 if (controller.isCommandAvailable(Player.COMMAND_STOP)) {
                     controller.stop()
                 }
             }
-            // If the playlist is not empty, and the controller is in an IDLE state (e.g., after being empty)
-            // it needs to be prepared.
             else if (mediaItems.isNotEmpty() && controller.playbackState == Player.STATE_IDLE) {
                 if (controller.isCommandAvailable(Player.COMMAND_PREPARE)) {
                     controller.prepare()
                 }
             }
-            // If it *was* playing, and the new playlist is not empty,
-            // but for some reason the controller stopped (e.g. current item removed and no auto-next),
-            // we should NOT automatically restart it here. The user should press play again
-            // if they want to start a new track from the updated playlist.
-            // The `preserveConfiguration=true` in setMediaItems should handle most cases
-            // of continuing playback if the current item is still valid.
         }
     }
 
 
+    @OptIn(UnstableApi::class)
     override fun onStart() {
         super.onStart()
         // Initialize MediaController
@@ -287,53 +287,25 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
         mediaControllerFuture.addListener({
             val connectedController = player // Safe access to the controller
             connectedController?.addListener(playerListener) // Add listener to get continuous updates
-
-            // Crucially, once the controller is connected, refresh the ViewModel's state
-            // based on the *current* state of the player from the service.
             connectedController?.let {
-                // Update ViewModel with the latest state from the MediaController
                 viewModel.updatePlaybackState(
                     isPlaying = it.isPlaying,
                     currentAartiId = it.currentMediaItem?.mediaId?.toIntOrNull(),
                     position = it.currentPosition,
                     duration = it.duration
                 )
-                // If it's playing, ensure the seekbar poller starts
                 if (it.isPlaying) {
                     startSeekBarUpdates()
                 } else {
-                    stopSeekBarUpdates() // Ensure it's stopped if player isn't playing
-                    // Also, ensure UI reflects the potentially non-zero paused position
+                    stopSeekBarUpdates()
                     if (!binding.playerControlsContainer.seekBarPlayer.isPressed) {
                         binding.playerControlsContainer.seekBarPlayer.progress = it.currentPosition.toInt().coerceAtLeast(0)
                     }
                     binding.playerControlsContainer.textViewCurrentTime.text = formatTime(it.currentPosition)
                 }
-
-                // You might also want to re-fetch the playlist if it could have changed
-                // while the UI was not visible. However, your current setup where
-                // updateServicePlaylist is called on aartiesStateFlow changes might be sufficient.
-                // Consider if an explicit playlist sync is needed here.
-                // For example:
-                // val initialCheckedAarties = viewModel.aartiesStateFlow.value.filter { a -> a.isChecked }
-                // updateServicePlaylist(initialCheckedAarties)
-                // if (initialCheckedAarties.isNotEmpty() && it.playbackState == Player.STATE_IDLE) {
-                //    it.prepare()
-                // }
             }
         }, ContextCompat.getMainExecutor(this))
     }
-
-
-    // onNewIntent() is relevant if you need to handle specific data passed IN the intent
-// from the notification, but for just bringing the activity to front and refreshing,
-// onStart() and the MediaController connection are usually enough.
-// override fun onNewIntent(intent: Intent?) {
-//    super.onNewIntent(intent)
-//    // If the intent from the notification carried specific data you need to process, do it here.
-//    // For example, if the notification intent had an extra like "play_specific_track_id".
-//    // Then, re-trigger UI updates or player actions.
-// }
 
     override fun onStop() {
         super.onStop()
@@ -413,7 +385,7 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
 
                 // It's also good to directly reset UI elements that the ViewModel might not
                 // immediately clear if its state update is generic.
-                binding.playerControlsContainer.textViewCurrentSong.text = "No Aarti Selected"
+                binding.playerControlsContainer.textViewCurrentSong.text = getString(R.string.no_aarti_selected)
                 binding.playerControlsContainer.seekBarPlayer.progress = 0
                 binding.playerControlsContainer.textViewCurrentTime.text = formatTime(0)
                 // Keep total duration as 0 or from last item, or reset explicitly
@@ -450,21 +422,62 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
         }
     }
 
-    private fun buildNotification(): Notification { // Or however you create your notification
-        val sessionActivityPendingIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
-            // Ensure this intent will bring MainActivity to front or create it
-            sessionIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP // Good flags
-            PendingIntent.getActivity(this, 0, sessionIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu) // Create main_menu.xml
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_change_language -> {
+                showLanguageSelectionDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showLanguageSelectionDialog() {
+        val languages = arrayOf("English", "मराठी (Marathi)")
+        val languageCodes = arrayOf("en", "mr")
+
+        val currentAppLocales = AppCompatDelegate.getApplicationLocales()
+        val currentLangCode = if (!currentAppLocales.isEmpty) {
+            currentAppLocales.get(0)?.toLanguageTag() ?: "en" // Default to English if null
+        } else {
+            // Fallback if empty (should ideally pick system default or your app's default)
+            Locale.getDefault().toLanguageTag().take(2)
         }
 
-        // When building your notification:
-        val notificationBuilder = NotificationCompat.Builder(this, "YOUR_NOTIFICATION_CHANNEL_ID")
-            // ... other notification settings (icon, title, actions)
-            .setContentIntent(sessionActivityPendingIntent) // THIS IS KEY
-        // ...
+        val checkedItem = languageCodes.indexOf(currentLangCode).coerceAtLeast(0)
 
-        return notificationBuilder.build()
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.select_language_title)) // Add to strings.xml
+            .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
+                val selectedLanguageCode = languageCodes[which]
+                setAppLocale(selectedLanguageCode)
+                dialog.dismiss()
+            }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> // Add to strings.xml
+                dialog.dismiss()
+            }
+            .show()
+    }
+
+    private fun setAppLocale(languageCode: String) {
+        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
+        // Call this on the main thread as it may re-create the Activity
+        runOnUiThread {
+            AppCompatDelegate.setApplicationLocales(appLocale)
+            // Note: The Activity will often be recreated by the system after calling
+            // setApplicationLocales. If not, you might need to manually recreate it
+            // for changes to fully apply, especially for complex UIs or older Android versions.
+            // For simple string changes, it might reflect immediately or after the next configuration change.
+            // For a more robust immediate update, you might call recreate() here,
+            // but be mindful of state saving.
+        }
     }
 
 }

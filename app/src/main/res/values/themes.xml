@@ -1,10 +1,53 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.GaneshAarties" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:ignore="NewApi">true</item>
+        <!-- ... your color attributes ... -->
+        <item name="colorPrimary">@color/orange_primary</item>
+        <item name="colorOnPrimary">@color/neutral_white</item>
+        <!-- ... etc. ... -->
+
+        <!-- For the main application content -->
+        <item name="android:colorBackground">@color/neutral_grey_light_background</item>
+        <item name="colorOnBackground">@color/neutral_text_dark_on_light</item>
+        <item name="colorSurface">@color/neutral_white</item>
+        <item name="colorOnSurface">@color/neutral_text_dark_on_light</item>
+        <!-- ... etc. ... -->
+
+        <!-- Theme attributes for your custom list item states -->
+        <item name="myPrimaryTextColor">?attr/colorOnSurface</item>
+        <item name="myIconTintColor">?attr/colorOnSurfaceVariant</item>
+        <item name="myListItemBackgroundColor">?attr/colorSurface</item>
+        <item name="myListItemPlayingBackgroundColor">@color/list_item_playing_background_light</item>
+        <item name="myListItemPlayingTextColor">@color/list_item_playing_text_light</item>
+        <item name="myListItemSelectedBackgroundColor">@color/list_item_selected_background_light</item>
+        <!-- ... etc. ... -->
+        <item name="colorSurfaceVariant">#EDEDED</item>
+        <item name="colorOnSurfaceVariant">@color/neutral_text_dark_on_light</item>
+        <!-- Correct Toolbar Styling -->
+        <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item> <!-- Or MyCustomToolbarStyle if you need deeper customization than just background/text color -->
+        <item name="popupTheme">@style/ThemeOverlay.Material3.Light</item>
+        <!-- Remove this if not explicitly needed for other Material components,
+             or ensure it's a general overlay, not Toolbar-specific, if it's meant for the whole activity -->
+        <!-- <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Toolbar.Surface</item> -->
+        <!-- If you want a general material theme overlay for the activity: -->
+        <!-- <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.Light</item> or similar -->
+
+        <item name="myListItemDefaultTextColor">?attr/colorOnSurface</item>
+        <item name="myListItemDefaultBackgroundColor">?attr/colorSurface</item>
+        <!-- where colorOnSurface is @color/neutral_text_dark_on_light -->
+        <!-- where colorSurface is @color/neutral_white -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item> <!-- Or ?attr/colorPrimary -->
+
     </style>
 
     <style name="Theme.GaneshAarties" parent="Base.Theme.GaneshAarties" />
+
+    <!-- Keep MyCustomToolbarStyle if you intend to use it and customize it further -->
+    <style name="MyCustomToolbarStyle" parent="Widget.Material3.Toolbar">
+        <!-- Example:
+        <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextColor">?attr/colorOnPrimary</item>
+        <item name="subtitleTextColor">?attr/colorOnPrimary</item>
+        -->
+    </style>
 </resources>
+    

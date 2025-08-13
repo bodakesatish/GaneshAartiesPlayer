@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">गणेश आरती प्लेयर</string>
+    <string name="no_aarti_selected">कोणतीही आरती निवडलेली नाही</string>
+    <string name="notification_channel_name">संगीत प्लेबॅक</string>
+    <string name="notification_channel_description">सध्या वाजत असलेले संगीत दर्शवते</string>
+
+    <!-- Player Controls -->
+    <string name="play_button_description">प्ले करा</string>
+    <string name="pause_button_description">विराम द्या</string>
+    <string name="next_button_description">पुढील आरती</string>
+    <string name="previous_button_description">मागील आरती</string>
+    <string name="volume_up_description">आवाज वाढवा</string>
+    <string name="volume_down_description">आवाज कमी करा</string>
+
+    <!-- Aarti Titles (Example) -->
+    <string name="sukhakarta_dukhaharta_title">सुखकर्ता दुःखहर्ता</string>
+    <string name="durge_durghat_bhari_title">दुर्गे दुर्घट भारी</string>
+    <string name="lavthavati_vikrala_title">लावतावती विक्रला</string>
+    <string name="yuge_atthavis_vitthala_title">युगे अठ्ठावीस</string>
+    <string name="datta_aarti_title">दत्ताची आरती</string>
+    <string name="ghalin_lotangan_vandin_charan_title">घालीन लोटांगण</string>
+
+    <!-- ... translate all other strings ... -->
+
+    <string name="change_language_menu_title">भाषा बदला</string>
+    <string name="select_language_title">भाषा निवडा</string>
+    <string name="cancel">रद्द करा</string>
+</resources>
