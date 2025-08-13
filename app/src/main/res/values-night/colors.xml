@@ -14,7 +14,7 @@
 
     <!-- UI Element Specific Colors - Dark Theme -->
     <color name="list_item_playing_background_dark">#FFAB40</color> <!-- Orange A200 (Vibrant) -->
-    <color name="list_item_playing_text_dark">@color/neutral_black</color>
+    <color name="list_item_playing_text_dark">@color/black</color>
 
     <color name="list_item_selected_background_dark">#5D4037</color> <!-- Brown 700 (Darker, less saturated orange/brown) -->
     <color name="list_item_selected_text_dark">#FFCC80</color>     <!-- Orange 200 -->

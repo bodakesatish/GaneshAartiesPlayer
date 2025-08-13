@@ -1,49 +1,56 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.GaneshAarties" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- ... other Material 3 color attributes for Dark Theme ... -->
-        <item name="colorPrimary">@color/orange_primary_dark_theme</item>
-        <item name="colorOnPrimary">@color/neutral_black</item>
-        <!-- ... other dark theme colors ... -->
+    <!-- Base application theme (Dark) -->
+    <style name="Theme.GaneshAartiesPlayer" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Material Color Palette (Dark Theme Overrides) -->
+        <item name="colorPrimary">@color/purple_200</item> <!-- Lighter primary for dark theme -->
+        <item name="colorPrimaryVariant">@color/purple_700</item> <!-- Can remain dark or be adjusted -->
+        <item name="colorOnPrimary">@color/black</item> <!-- Text on light primary -->
+        <item name="colorPrimaryContainer">@color/purple_700</item>
+        <item name="colorOnPrimaryContainer">@color/purple_200</item>
 
-        <item name="android:colorBackground">@color/neutral_grey_dark_background</item>
-        <item name="colorOnBackground">@color/neutral_text_light_on_dark</item>
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/teal_700</item>
+        <item name="colorOnSecondaryContainer">@color/teal_200</item>
 
-        <item name="toolbarStyle">@style/Widget.Material3.Toolbar</item>
-        <item name="popupTheme">@style/ThemeOverlay.Material3.Dark</item>
+        <item name="colorTertiary">@color/purple_500</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">@color/purple_200</item>
+        <item name="colorOnTertiaryContainer">@color/purple_700</item>
 
-        <!-- ... -->
-        <item name="myPrimaryTextColor">?attr/colorOnSurface</item>
-        <item name="myIconTintColor">?attr/colorOnSurfaceVariant</item>
+        <item name="android:colorBackground">@color/black</item> <!-- Common dark theme background -->
+        <item name="colorOnBackground">@color/white</item>
 
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryDark</item>
+        <item name="colorSurface">@color/purple_200</item> <!-- Standard dark surface color -->
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorSurfaceVariant">#2C2C2C</item> <!-- Slightly different dark surface -->
+        <item name="colorOnSurfaceVariant">@color/white</item>
 
-        <!-- Use Material 3's dedicated Toolbar style -->
-        <!-- For popup menus triggered from the Toolbar -->
-<!--        <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Toolbar.Surface</item>-->
+        <item name="colorError">#CF6679</item> <!-- Lighter error for dark theme -->
+        <item name="colorOnError">@color/black</item>
 
-        <!-- Custom Attributes for your App (Dark Theme Specifics) -->
-        <!-- ... your custom dark theme attributes ... -->
-        <item name="myListItemPlayingBackgroundColor">@color/list_item_playing_background_dark</item>
-        <item name="myListItemPlayingTextColor">@color/list_item_playing_text_dark</item>
-        <!-- ... -->
-        <item name="materialThemeOverlay">@style/ThemeOverlay.Material3.Toolbar.Surface</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item> <!-- Match dark surface -->
+        <!-- <item name="android:statusBarColor">@android:color/transparent</item> -->
+        <!-- <item name="android:navigationBarColor">@android:color/transparent</item> -->
 
-        <!-- REMOVE or COMMENT OUT the old actionBarTheme and actionBarPopupTheme -->
-        <!--
-        <item name="actionBarTheme">@style/ThemeOverlay.Material3.ActionBar.Dark</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.Material3.Dark</item>
-        -->
-        <item name="myListItemSelectedBackgroundColor">@color/list_item_selected_background_light</item>
+        <!-- Custom App Specific Theme Attributes (Dark Theme Overrides) -->
+        <item name="myListItemPlayingBackgroundColor">@color/aarti_item_playing_background_dark</item>
+        <item name="myListItemPlayingTextColor">@color/aarti_item_playing_text_dark</item>
+        <item name="myListItemSelectedBackgroundColor">@color/aarti_item_selected_background_dark</item>
+        <item name="myListItemSelectedTextColor">@color/aarti_item_selected_text_dark</item>
+        <item name="myListItemBackgroundColor">@color/aarti_item_default_background_dark</item>
+        <item name="myPrimaryTextColor">@color/aarti_item_default_text_dark</item>
 
-        <item name="colorSurface">@color/neutral_grey_dark_background</item>
-        <item name="colorOnSurface">@color/neutral_text_light_on_dark</item>
-        <!-- You'd also need colorSurfaceVariant and colorOnSurfaceVariant defined for dark theme -->
-        <item name="myListItemDefaultTextColor">?attr/colorOnSurface</item>
-        <item name="myListItemDefaultBackgroundColor">?attr/colorSurface</item>
-        <!-- Custom Attributes for your App (Dark Theme Specifics) -->
-        <!-- You need to define these for the dark theme as well -->
-        <item name="myListItemBackgroundColor">?attr/colorSurface</item> <!-- This will correctly pick up the dark theme's colorSurface -->
-        <item name="myListItemSelectedTextColor">?attr/colorOnSurface</item>
+        <!-- Component Styles (can inherit from light or be overridden) -->
+        <item name="toolbarStyle">@style/Widget.App.Toolbar</item> <!-- Will use dark theme attributes -->
+        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
+        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
 
+        <!-- Ensure dark themes to make status bar icons light -->
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
     </style>
+
+    <!-- You can override Widget.App.Toolbar specifically for dark if needed,
+         but often the base style with theme attributes is sufficient. -->
+
 </resources>

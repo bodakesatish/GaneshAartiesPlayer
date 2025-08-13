@@ -12,7 +12,6 @@ import androidx.annotation.OptIn
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.os.LocaleListCompat
@@ -20,6 +19,8 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MediaItem as Media3MediaItem // Alias to avoid confusion
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
@@ -33,245 +34,246 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity(), AartiItemListener {
+class MainActivity : AppCompatActivity(), AartiInteractionListener {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: AartiViewModel by viewModels() // Use the same ViewModel
-    private lateinit var aartiAdapter: AartiAdapter
+    private val viewModel: AartiViewModel by viewModels()
+    private lateinit var playlistAdapter: AartiAdapter // Renamed
     private var itemTouchHelper: ItemTouchHelper? = null
 
-    // Media Controller related
     private lateinit var mediaControllerFuture: ListenableFuture<MediaController>
-    private val player: MediaController?
+    private val mediaController: MediaController?
         get() = if (mediaControllerFuture.isDone && !mediaControllerFuture.isCancelled) mediaControllerFuture.get() else null
 
-    // MusicService related (same as before, but binding might be different if not using MediaController solely)
-    // private var musicService: MusicService? = null
-    // private var isServiceBound = false
-    // private val serviceConnection = object : ServiceConnection { ... }
-
-
-    private val progressUpdateHandler = Handler(Looper.getMainLooper())
-    private var progressUpdateRunnable: Runnable? = null
-
+    private val playerProgressHandler = Handler(Looper.getMainLooper())
+    private var playerProgressPoller: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false) // Enable edge-to-edge
-
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Set up the Toolbar
-        val toolbar: Toolbar = binding.toolbar // If using ViewBinding
-        // Or: val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = getString(R.string.app_name) // Set your desired title
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = getString(R.string.app_name)
+        // Control Status Bar Icon Color
+//        val windowInsetsController = WindowCompat.getInsetsController(window, window.decorView)
+//        // For light themes, tell the system that the status bar background is light,
+//        // so it should use dark icons.
+//        windowInsetsController.isAppearanceLightStatusBars = true // true for light status bar, false for dark
 
-
-        setupRecyclerView()
-        setupPlayerControls()
-        observeViewModel()
+        initializeRecyclerView()
+        initializePlayerControls()
+        observeViewState()
     }
 
-    private fun setupRecyclerView() {
-        aartiAdapter = AartiAdapter(this)
+    private fun initializeRecyclerView() {
+        playlistAdapter = AartiAdapter(this)
         binding.recyclerViewAarties.apply {
-            adapter = aartiAdapter
+            adapter = playlistAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
 
-        val callback = object : ItemTouchHelper.SimpleCallback(
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0 // No swipe actions
+        val dragCallback = object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
         ) {
             override fun isLongPressDragEnabled(): Boolean {
-                // Only allow dragging if music is not playing
-                // You'll get isPlaying state from the ViewModel's playerUiState
-                return viewModel.playerUiState.value.isPlaying.not()
+                return viewModel.playerState.value.isPlaying.not()
             }
 
-            override fun isItemViewSwipeEnabled(): Boolean {
-                return false // Swiping not used
-            }
+            override fun isItemViewSwipeEnabled(): Boolean = false
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-                // Check again here as a safeguard, though isLongPressDragEnabled should mostly cover it
-                if (!viewModel.playerUiState.value.isPlaying) {
-                    val fromPosition = viewHolder.adapterPosition
-                    val toPosition = target.adapterPosition
-                    if (fromPosition != RecyclerView.NO_POSITION && toPosition != RecyclerView.NO_POSITION) {
-                        viewModel.moveAarti(fromPosition, toPosition)
+                if (!viewModel.playerState.value.isPlaying) {
+                    val fromPos = viewHolder.adapterPosition
+                    val toPos = target.adapterPosition
+                    if (fromPos != RecyclerView.NO_POSITION && toPos != RecyclerView.NO_POSITION) {
+                        viewModel.moveAartiInPlaylist(fromPos, toPos)
                     }
                     return true
                 }
                 return false
             }
 
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                // Not used
-            }
-            // Optional: Customize appearance during drag
-            // override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) { ... }
-            // override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) { ... }
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
         }
-        itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper = ItemTouchHelper(dragCallback)
         itemTouchHelper?.attachToRecyclerView(binding.recyclerViewAarties)
     }
 
-    private fun setupPlayerControls() {
+    private fun initializePlayerControls() {
         binding.playerControlsContainer.buttonPlayPause.setOnClickListener {
-            player?.let {
-                if (it.isPlaying) {
-                    it.pause()
-                } else {
-                    it.play()
-                }
+            mediaController?.let {
+                if (it.isPlaying) it.pause() else it.play()
             }
-            // Alternative: viewModel.onPlayPauseClicked() if ViewModel sends command to service
         }
-
-        binding.playerControlsContainer.buttonNext.setOnClickListener {
-            player?.seekToNextMediaItem()
-        }
-
-        binding.playerControlsContainer.buttonPrevious.setOnClickListener {
-            player?.seekToPreviousMediaItem()
-        }
+        binding.playerControlsContainer.buttonNext.setOnClickListener { mediaController?.seekToNextMediaItem() }
+        binding.playerControlsContainer.buttonPrevious.setOnClickListener { mediaController?.seekToPreviousMediaItem() }
 
         binding.playerControlsContainer.seekBarPlayer.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    player?.seekTo(progress.toLong())
-                    // viewModel.onSeekBarPositionChanged(progress.toLong())
-                }
+                if (fromUser) mediaController?.seekTo(progress.toLong())
             }
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
     }
-    private fun observeViewModel() {
+
+    private fun observeViewState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Observe the list of aarties
                 launch {
-                    viewModel.aartiesStateFlow.collect { aartiList ->
-                        aartiAdapter.submitList(aartiList)
-
-                        // Then, explicitly update the playing state based on the current playerUiState
-                        // This ensures that if the list updates, the playing highlight is reapplied correctly.
-                        val currentUiState = viewModel.playerUiState.value
-                        aartiAdapter.setPlayingState(currentUiState.currentAarti?.id, currentUiState.isPlaying)
-
-
-                        // Only update the service's playlist. Don't auto-play here.
-                        // The decision to play will be handled by play/pause button or
-                        // if playback was already active.
-                        val checkedAarties = aartiList.filter { it.isChecked }
-                        updateServicePlaylist(checkedAarties) // Renamed for clarity
+                    viewModel.aartiItems.collect { aartiList ->
+                        playlistAdapter.submitList(aartiList)
+                        // This collect block in viewModel.playerState handles playlist sync with controller
                     }
                 }
 
-                // Observe player UI state
                 launch {
-                    viewModel.playerUiState.collect { state ->
-
+                    viewModel.playerState.collect { state ->
                         binding.playerControlsContainer.textViewCurrentSong.setText(
-                            state.currentAarti?.title ?: R.string.no_aarti_selected)
+                            state.currentAarti?.title ?: R.string.no_aarti_selected
+                        )
                         binding.playerControlsContainer.buttonPlayPause.setImageResource(
                             if (state.isPlaying) R.drawable.ic_pause else R.drawable.ic_play_arrow
                         )
-                        // SeekBar updates
-                        binding.playerControlsContainer.seekBarPlayer.max = state.totalDuration.toInt().coerceAtLeast(0) // Will be 0
+                        binding.playerControlsContainer.seekBarPlayer.max = state.totalDurationMs.toInt().coerceAtLeast(0)
                         if (!binding.playerControlsContainer.seekBarPlayer.isPressed) {
-                            binding.playerControlsContainer.seekBarPlayer.progress = state.currentPosition.toInt().coerceAtLeast(0) // Will be 0
+                            binding.playerControlsContainer.seekBarPlayer.progress = state.currentPositionMs.toInt().coerceAtLeast(0)
                         }
+                        binding.playerControlsContainer.textViewCurrentTime.text = formatDuration(state.currentPositionMs)
+                        binding.playerControlsContainer.textViewTotalTime.text = formatDuration(state.totalDurationMs)
 
-                        // Time TextViews
-                        binding.playerControlsContainer.textViewCurrentTime.text = formatTime(state.currentPosition) // Will be 00:00
-                        binding.playerControlsContainer.textViewTotalTime.text = formatTime(state.totalDuration)     // Will be 00:00
+                        playlistAdapter.updatePlaybackVisuals(state.currentAarti?.id, state.isPlaying)
+                        playlistAdapter.setUserInteractionEnabled(!state.isPlaying)
 
-                        // Update adapter's playing state
-                        aartiAdapter.setPlayingState(state.currentAarti?.id, state.isPlaying) // <--- ADD THIS
-
-                        // Enable/disable interactions based on playing state
-                        aartiAdapter.setInteractionsEnabled(!state.isPlaying)
+                        synchronizePlaylistWithMediaController(state.currentPlaylist)
 
 
                         if (state.isPlaying) {
-                            startSeekBarUpdates()
+                            startPlayerProgressPoller()
                         } else {
-                            stopSeekBarUpdates()
-                            // Ensure final position is set when stopping
+                            stopPlayerProgressPoller()
+                            // Ensure final UI update for position if paused or stopped
                             if (!binding.playerControlsContainer.seekBarPlayer.isPressed) {
-                                binding.playerControlsContainer.seekBarPlayer.progress = state.currentPosition.toInt().coerceAtLeast(0)
+                                binding.playerControlsContainer.seekBarPlayer.progress = state.currentPositionMs.toInt().coerceAtLeast(0)
                             }
-                            binding.playerControlsContainer.textViewCurrentTime.text = formatTime(state.currentPosition)
+                            binding.playerControlsContainer.textViewCurrentTime.text = formatDuration(state.currentPositionMs)
                         }
+
+                        // Enable/disable next/prev based on playlist existence
+                        val hasPlaylist = state.currentPlaylist.isNotEmpty()
+                        binding.playerControlsContainer.buttonNext.isEnabled = hasPlaylist && mediaController?.hasNextMediaItem() == true
+                        binding.playerControlsContainer.buttonPrevious.isEnabled = hasPlaylist && mediaController?.hasPreviousMediaItem() == true
+                        binding.playerControlsContainer.buttonPlayPause.isEnabled = hasPlaylist // Can play if playlist exists
+
                     }
                 }
             }
         }
     }
 
-    private fun startSeekBarUpdates() {
-        stopSeekBarUpdates() // Stop any existing runnable
-        if (player == null) return
+    private fun startPlayerProgressPoller() {
+        stopPlayerProgressPoller()
+        if (mediaController == null) return
 
-        progressUpdateRunnable = object : Runnable {
+        playerProgressPoller = object : Runnable {
             override fun run() {
-                player?.let { controller ->
+                mediaController?.let { controller ->
                     if (controller.isPlaying) {
-                        val currentPosition = controller.currentPosition
-                        val duration = controller.duration
-                        viewModel.updatePlaybackState( // Update ViewModel which triggers UI
+                        viewModel.setPlayerState(
                             isPlaying = true,
                             currentAartiId = controller.currentMediaItem?.mediaId?.toIntOrNull(),
-                            position = currentPosition,
-                            duration = duration
+                            positionMs = controller.currentPosition,
+                            durationMs = controller.duration
                         )
-                        progressUpdateHandler.postDelayed(this, 500) // Update every 500ms
+                        playerProgressHandler.postDelayed(this, 500)
                     } else {
-                        viewModel.updatePlaybackState(
+                        // If not playing, ensure ViewModel has the final state before stopping poller
+                        viewModel.setPlayerState(
                             isPlaying = false,
                             currentAartiId = controller.currentMediaItem?.mediaId?.toIntOrNull(),
-                            position = controller.currentPosition, // get final position
-                            duration = controller.duration
+                            positionMs = controller.currentPosition,
+                            durationMs = controller.duration
                         )
                     }
                 }
             }
         }
-        progressUpdateHandler.post(progressUpdateRunnable!!)
+        playerProgressHandler.post(playerProgressPoller!!)
     }
 
-    private fun stopSeekBarUpdates() {
-        progressUpdateRunnable?.let { progressUpdateHandler.removeCallbacks(it) }
-        progressUpdateRunnable = null
+    private fun stopPlayerProgressPoller() {
+        playerProgressPoller?.let { playerProgressHandler.removeCallbacks(it) }
+        playerProgressPoller = null
     }
 
-    private fun updateServicePlaylist(playlist: List<AartiItem>) {
-        player?.let { controller ->
-            val mediaItems = playlist.map { aarti ->
+    private fun synchronizePlaylistWithMediaController(playlist: List<AartiItem>) {
+        mediaController?.let { controller ->
+            val media3Items = playlist.map { aarti ->
                 val uri = "android.resource://${packageName}/${aarti.rawResourceId}".toUri()
-                androidx.media3.common.MediaItem.Builder()
+                val mediaMetadata = MediaMetadata.Builder()
+                    .setTitle(getString(aarti.title)) // Get the string title
+                    // You can add other metadata like artist, album art URI, etc.
+                    // .setArtist("Your Artist")
+                    // .setArtworkUri("path/to/artwork.jpg".toUri())
+                    .build()
+                Media3MediaItem.Builder()
                     .setUri(uri)
                     .setMediaId(aarti.id.toString())
+                    // You can add more metadata here if needed by your notification/service
+                     .setMediaMetadata(MediaMetadata.Builder()
+                     .setTitle(getString(aarti.title)).build())
                     .build()
             }
 
-            val wasPlaying = controller.isPlaying
-            controller.setMediaItems(mediaItems, true)
-            if (mediaItems.isEmpty() && wasPlaying) {
-                if (controller.isCommandAvailable(Player.COMMAND_STOP)) {
-                    controller.stop()
-                }
+            // Only update if the playlist content or order has actually changed.
+            // This basic check compares IDs and order. More sophisticated diffing could be used.
+            val currentControllerPlaylistIds = (0 until controller.mediaItemCount).mapNotNull {
+                controller.getMediaItemAt(it).mediaId
             }
-            else if (mediaItems.isNotEmpty() && controller.playbackState == Player.STATE_IDLE) {
-                if (controller.isCommandAvailable(Player.COMMAND_PREPARE)) {
-                    controller.prepare()
+            val newPlaylistIds = media3Items.map { it.mediaId }
+
+            if (currentControllerPlaylistIds != newPlaylistIds) {
+                val wasPlaying = controller.isPlaying
+                val currentMediaId = controller.currentMediaItem?.mediaId
+                val currentWindowIndex = controller.currentMediaItemIndex
+                val currentPosition = controller.currentPosition
+
+                controller.setMediaItems(media3Items, false) // resetPosition = false initially
+
+                if (media3Items.isEmpty()) {
+                    if (wasPlaying || controller.playbackState != Player.STATE_IDLE) {
+                        if (controller.isCommandAvailable(Player.COMMAND_STOP)) {
+                            controller.stop()
+                            controller.clearMediaItems() // Also clear them explicitly
+                        }
+                    }
+                } else {
+                    // Try to restore playback position if the playing item is still in the new playlist
+                    val newIndexOfCurrentItem = media3Items.indexOfFirst { it.mediaId == currentMediaId }
+                    if (newIndexOfCurrentItem != -1) {
+                        controller.seekTo(newIndexOfCurrentItem, currentPosition)
+                    } else if (currentWindowIndex < media3Items.size) {
+                        // Fallback: seek to the same index if item changed but index is valid
+                        controller.seekToDefaultPosition(currentWindowIndex)
+                    } else {
+                        // Fallback: seek to the beginning of the new playlist
+                        controller.seekToDefaultPosition(0)
+                    }
+
+                    if (controller.playbackState == Player.STATE_IDLE || controller.playbackState == Player.STATE_ENDED) {
+                        if (controller.isCommandAvailable(Player.COMMAND_PREPARE)) {
+                            controller.prepare()
+                        }
+                    }
+                    if (wasPlaying && !controller.isPlaying) {
+                        controller.play()
+                    }
                 }
             }
         }
@@ -281,130 +283,77 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
     @OptIn(UnstableApi::class)
     override fun onStart() {
         super.onStart()
-        // Initialize MediaController
         val sessionToken = SessionToken(this, ComponentName(this, MusicService::class.java))
         mediaControllerFuture = MediaController.Builder(this, sessionToken).buildAsync()
         mediaControllerFuture.addListener({
-            val connectedController = player // Safe access to the controller
-            connectedController?.addListener(playerListener) // Add listener to get continuous updates
-            connectedController?.let {
-                viewModel.updatePlaybackState(
+            mediaController?.addListener(mediaPlayerListener)
+            mediaController?.let {
+                viewModel.setPlayerState(
                     isPlaying = it.isPlaying,
                     currentAartiId = it.currentMediaItem?.mediaId?.toIntOrNull(),
-                    position = it.currentPosition,
-                    duration = it.duration
+                    positionMs = it.currentPosition,
+                    durationMs = it.duration
                 )
-                if (it.isPlaying) {
-                    startSeekBarUpdates()
-                } else {
-                    stopSeekBarUpdates()
-                    if (!binding.playerControlsContainer.seekBarPlayer.isPressed) {
-                        binding.playerControlsContainer.seekBarPlayer.progress = it.currentPosition.toInt().coerceAtLeast(0)
-                    }
-                    binding.playerControlsContainer.textViewCurrentTime.text = formatTime(it.currentPosition)
-                }
+                if (it.isPlaying) startPlayerProgressPoller() else stopPlayerProgressPoller()
             }
         }, ContextCompat.getMainExecutor(this))
     }
 
     override fun onStop() {
         super.onStop()
-        player?.removeListener(playerListener)
+        mediaController?.removeListener(mediaPlayerListener)
         MediaController.releaseFuture(mediaControllerFuture)
-        stopSeekBarUpdates() // Stop updates when activity is not visible
+        stopPlayerProgressPoller()
     }
 
-    // AartiItemListener implementation
     override fun onAartiToggled(aarti: AartiItem, isChecked: Boolean) {
-        viewModel.onAartiCheckedChanged(aarti, isChecked)
-        // The observer for viewModel.aartiesStateFlow will handle updating the player
+        viewModel.toggleAartiSelection(aarti, isChecked)
     }
 
     override fun onStartDrag(viewHolder: RecyclerView.ViewHolder) {
         itemTouchHelper?.startDrag(viewHolder)
     }
 
-    private fun formatTime(ms: Long): String {
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(ms)
-        val seconds = TimeUnit.MILLISECONDS.toSeconds(ms) % 60
-        return String.format("%02d:%02d", minutes, seconds)
+    private fun formatDuration(milliseconds: Long): String {
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
     }
 
-    // Player.Listener (same as in Compose version to update ViewModel)
-
-    private val playerListener = object : Player.Listener {
+    private val mediaPlayerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-            val currentMediaId = player?.currentMediaItem?.mediaId
-            val position = player?.currentPosition ?: 0L
-            val duration = player?.duration ?: 0L // Get duration here
-
-            viewModel.updatePlaybackState(
+            viewModel.setPlayerState(
                 isPlaying = isPlaying,
-                currentAartiId = currentMediaId?.toIntOrNull(),
-                position = position,
-                duration = duration // Pass duration
+                currentAartiId = mediaController?.currentMediaItem?.mediaId?.toIntOrNull(),
+                positionMs = mediaController?.currentPosition ?: 0L,
+                durationMs = mediaController?.duration ?: 0L
             )
-            // Start/stop poller (this logic is already in your observeViewModel,
-            // but direct calls can be slightly more responsive here)
-            if (isPlaying) {
-                startSeekBarUpdates()
-            } else {
-                stopSeekBarUpdates()
-                // Ensure final UI update for position if paused or stopped not due to playlist end
-                if (player?.playbackState != Player.STATE_ENDED) {
-                    if (!binding.playerControlsContainer.seekBarPlayer.isPressed) {
-                        binding.playerControlsContainer.seekBarPlayer.progress = position.toInt().coerceAtLeast(0)
-                    }
-                    binding.playerControlsContainer.textViewCurrentTime.text = formatTime(position)
-                }
-            }
+            // Poller start/stop is handled by the viewModel.playerState collector
         }
 
-        override fun onMediaItemTransition(mediaItem: androidx.media3.common.MediaItem?, reason: Int) {
-            val newPosition = 0L
-            val newDuration = player?.duration ?: 0L
-            viewModel.updatePlaybackState(
-                isPlaying = player?.isPlaying ?: false,
+        override fun onMediaItemTransition(mediaItem: Media3MediaItem?, reason: Int) {
+            viewModel.setPlayerState(
+                isPlaying = mediaController?.isPlaying ?: false,
                 currentAartiId = mediaItem?.mediaId?.toIntOrNull(),
-                position = newPosition,
-                duration = newDuration
+                positionMs = 0L, // Position resets on transition
+                durationMs = mediaController?.duration ?: 0L
             )
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
-            val currentPosition = player?.currentPosition ?: 0L
-            val duration = player?.duration ?: 0L
-            val isPlaying = player?.isPlaying ?: false // isPlaying might still be true briefly before STATE_ENDED fully processes
-
             if (playbackState == Player.STATE_ENDED) {
-                // Playlist has finished
-                stopSeekBarUpdates() // Stop polling for progress
-
-                // Update ViewModel to reflect playlist ended state
-                viewModel.handlePlaylistEnded() // We'll create this method in ViewModel
-
-                // It's also good to directly reset UI elements that the ViewModel might not
-                // immediately clear if its state update is generic.
-                binding.playerControlsContainer.textViewCurrentSong.text = getString(R.string.no_aarti_selected)
-                binding.playerControlsContainer.seekBarPlayer.progress = 0
-                binding.playerControlsContainer.textViewCurrentTime.text = formatTime(0)
-                // Keep total duration as 0 or from last item, or reset explicitly
-                binding.playerControlsContainer.seekBarPlayer.max = 0 // Reset max as well
-                binding.playerControlsContainer.textViewTotalTime.text = formatTime(0)
-                binding.playerControlsContainer.buttonPlayPause.setImageResource(R.drawable.ic_play_arrow)
-                // Disable next/prev buttons as there's nothing to play
-                binding.playerControlsContainer.buttonNext.isEnabled = false
-                binding.playerControlsContainer.buttonPrevious.isEnabled = false
-
-
+                viewModel.onPlaylistFinished()
+                // UI resets for buttons/text are handled by viewModel.playerState collector
             } else {
-                // For other states like READY, BUFFERING, update the generic playback state
-                viewModel.updatePlaybackState(
-                    isPlaying = isPlaying, // Use the current isPlaying state
-                    currentAartiId = player?.currentMediaItem?.mediaId?.toIntOrNull(),
-                    position = currentPosition,
-                    duration = duration
-                )
+                // For other states, ensure the ViewModel is updated with current timing info
+                mediaController?.let {
+                    viewModel.setPlayerState(
+                        isPlaying = it.isPlaying,
+                        currentAartiId = it.currentMediaItem?.mediaId?.toIntOrNull(),
+                        positionMs = it.currentPosition,
+                        durationMs = it.duration
+                    )
+                }
             }
         }
 
@@ -413,71 +362,47 @@ class MainActivity : AppCompatActivity(), AartiItemListener {
             newPosition: Player.PositionInfo,
             reason: Int
         ) {
-            viewModel.updatePlaybackState(
-                isPlaying = player?.isPlaying ?: false,
-                currentAartiId = player?.currentMediaItem?.mediaId?.toIntOrNull(),
-                position = newPosition.positionMs,
-                duration = player?.duration ?: 0L
-            )
+            mediaController?.let {
+                viewModel.setPlayerState(
+                    isPlaying = it.isPlaying,
+                    currentAartiId = it.currentMediaItem?.mediaId?.toIntOrNull(),
+                    positionMs = newPosition.positionMs,
+                    durationMs = it.duration
+                )
+            }
         }
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu) // Create main_menu.xml
+        menuInflater.inflate(R.menu.main_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_change_language -> {
-                showLanguageSelectionDialog()
+                displayLanguageSelectionDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun showLanguageSelectionDialog() {
+    private fun displayLanguageSelectionDialog() {
         val languages = arrayOf("English", "मराठी (Marathi)")
         val languageCodes = arrayOf("en", "mr")
 
-        val currentAppLocales = AppCompatDelegate.getApplicationLocales()
-        val currentLangCode = if (!currentAppLocales.isEmpty) {
-            currentAppLocales.get(0)?.toLanguageTag() ?: "en" // Default to English if null
-        } else {
-            // Fallback if empty (should ideally pick system default or your app's default)
-            Locale.getDefault().toLanguageTag().take(2)
-        }
-
+        val currentLangCode = AppCompatDelegate.getApplicationLocales().get(0)?.toLanguageTag() ?: Locale.getDefault().toLanguageTag().take(2)
         val checkedItem = languageCodes.indexOf(currentLangCode).coerceAtLeast(0)
 
-
         AlertDialog.Builder(this)
-            .setTitle(getString(R.string.select_language_title)) // Add to strings.xml
+            .setTitle(getString(R.string.select_language_title))
             .setSingleChoiceItems(languages, checkedItem) { dialog, which ->
-                val selectedLanguageCode = languageCodes[which]
-                setAppLocale(selectedLanguageCode)
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageCodes[which]))
                 dialog.dismiss()
+                // Activity will be recreated.
             }
-            .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> // Add to strings.xml
-                dialog.dismiss()
-            }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
             .show()
     }
-
-    private fun setAppLocale(languageCode: String) {
-        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
-        // Call this on the main thread as it may re-create the Activity
-        runOnUiThread {
-            AppCompatDelegate.setApplicationLocales(appLocale)
-            // Note: The Activity will often be recreated by the system after calling
-            // setApplicationLocales. If not, you might need to manually recreate it
-            // for changes to fully apply, especially for complex UIs or older Android versions.
-            // For simple string changes, it might reflect immediately or after the next configuration change.
-            // For a more robust immediate update, you might call recreate() here,
-            // but be mindful of state saving.
-        }
-    }
-
 }

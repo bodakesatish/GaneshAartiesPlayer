@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorSurfaceContainerLowest"
+    style="@style/PlayerControlsContainerStyle"
     android:orientation="vertical"
     android:padding="16dp"> <!-- Or another suitable background -->
-
+    <!-- Apply the style -->
     <TextView
         android:id="@+id/textViewCurrentSong"
         android:layout_width="match_parent"

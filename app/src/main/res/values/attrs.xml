@@ -1,13 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="myPrimaryTextColor" format="color" />
-    <attr name="myIconTintColor" format="color" />
-    <attr name="myListItemBackgroundColor" format="color" />
-
+    <!-- Custom Attributes for Aarti List Item States -->
     <attr name="myListItemPlayingBackgroundColor" format="color" />
     <attr name="myListItemPlayingTextColor" format="color" />
     <attr name="myListItemSelectedBackgroundColor" format="color" />
     <attr name="myListItemSelectedTextColor" format="color" />
-    <attr name="myListItemDefaultBackgroundColor" format="color" />
-    <attr name="myListItemDefaultTextColor" format="color" />
-    <attr name="popupTheme" format="reference" />
+    <attr name="myListItemBackgroundColor" format="color" />
+    <attr name="myPrimaryTextColor" format="color" />
+    <attr name="myIconTintColor" format="color" />
 </resources>

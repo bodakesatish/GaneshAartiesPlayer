@@ -7,7 +7,8 @@
     android:layout_marginStart="8dp"
     android:layout_marginTop="4dp"
     android:layout_marginEnd="8dp"
-    android:layout_marginBottom="4dp">
+    android:layout_marginBottom="4dp"
+    android:background="?attr/myListItemBackgroundColor">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -32,7 +33,7 @@
             app:layout_constraintEnd_toStartOf="@id/imageViewDragHandle"
             app:layout_constraintStart_toEndOf="@id/checkboxAarti"
             app:layout_constraintTop_toTopOf="parent"
-            android:textColor="?attr/myPrimaryTextColor"
+            android:textAppearance="?attr/textAppearanceListItem"
             tools:text="Aarti Title Here" />
 
         <ImageView
@@ -42,7 +43,7 @@
             android:contentDescription="Drag to reorder"
             android:padding="8dp"
             android:src="@drawable/ic_drag_handle"
-            app:tint="?attr/myIconTintColor"
+            app:tint="?attr/colorControlNormal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>

@@ -1,11 +1,19 @@
 package com.bodakesatish.ganeshaarties
 
-// In MusicService.kt
 import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context // For NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
+import androidx.annotation.OptIn
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -13,179 +21,193 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import androidx.media3.ui.PlayerNotificationManager
 
-private const val YOUR_NOTIFICATION_ID = 123
-private const val YOUR_NOTIFICATION_CHANNEL_ID = "music_playback_channel"
+private const val PLAYBACK_NOTIFICATION_ID = 123
+private const val PLAYBACK_NOTIFICATION_CHANNEL_ID = "music_playback_channel"
 
-@UnstableApi // For Media3 components that might still be unstable
+@UnstableApi
 class MusicService : MediaSessionService() {
 
     private var mediaSession: MediaSession? = null
-    private lateinit var player: ExoPlayer
+    private lateinit var exoPlayer: ExoPlayer
     private var playerNotificationManager: PlayerNotificationManager? = null
-
-    // To manually track if we called startForeground
-    private var isServiceInForeground = false
+    private var isServiceCurrentlyInForeground = false
 
     override fun onCreate() {
         super.onCreate()
-        isServiceInForeground = false // Initialize
+        isServiceCurrentlyInForeground = false
 
-        player = ExoPlayer.Builder(this).build().apply {
-            // Configure player
-            addListener(servicePlayerListener)
+        exoPlayer = ExoPlayer.Builder(this)
+            .setAudioAttributes(AudioAttributes.DEFAULT, true)
+            .setHandleAudioBecomingNoisy(true)
+            .setWakeMode(C.WAKE_MODE_LOCAL) // Keep CPU awake during playback
+            .build().apply {
+                addListener(internalPlayerListener)
+            }
+
+        val sessionActivityPendingIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
+            PendingIntent.getActivity(
+                this, 0, sessionIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
         }
 
-        mediaSession = MediaSession.Builder(this, player)
-            .setSessionActivity(packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
-                PendingIntent.getActivity(
-                    this, 0, sessionIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            } as PendingIntent)
+        mediaSession = MediaSession.Builder(this, exoPlayer)
+            .setSessionActivity(sessionActivityPendingIntent!!)
             .build()
 
-        setupNotificationManager()
+        initializeNotificationManager()
     }
 
-    private fun setupNotificationManager() {
-        createNotificationChannel()
+    private fun initializeNotificationManager() {
+        createNotificationChannelIfNeeded()
 
         playerNotificationManager = PlayerNotificationManager.Builder(
             this,
-            YOUR_NOTIFICATION_ID,
-            YOUR_NOTIFICATION_CHANNEL_ID
+            PLAYBACK_NOTIFICATION_ID,
+            PLAYBACK_NOTIFICATION_CHANNEL_ID
         )
             .setMediaDescriptionAdapter(object : PlayerNotificationManager.MediaDescriptionAdapter {
                 override fun getCurrentContentTitle(player: Player): CharSequence {
-                    return player.mediaMetadata.title ?: "Unknown Title"
+                    // Title for notification - use MediaItem's metadata if available
+                    // The MainActivity should be setting this when creating MediaItems
+                    val mediaItemTitle = player.currentMediaItem?.mediaMetadata?.title
+                    return mediaItemTitle ?: getString(R.string.no_aarti_selected)
                 }
 
                 override fun createCurrentContentIntent(player: Player): PendingIntent? {
-                    val intent = packageManager?.getLaunchIntentForPackage(packageName)?.apply {
-                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                    }
-                    return if (intent != null) {
+                    // Intent to launch when notification is clicked
+                    return packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
                         PendingIntent.getActivity(
-                            this@MusicService, 0, intent,
+                            this@MusicService, 0, sessionIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                         )
-                    } else {
-                        null
                     }
                 }
 
                 override fun getCurrentContentText(player: Player): CharSequence? {
-                    return player.mediaMetadata.artist ?: "Unknown Artist"
+                    // Optional: Subtext for the notification
+                    return null // Or player.currentMediaItem?.mediaMetadata?.artist for example
                 }
 
                 override fun getCurrentLargeIcon(
                     player: Player,
                     callback: PlayerNotificationManager.BitmapCallback
-                ): android.graphics.Bitmap? {
-                    return null // Load album art asynchronously if needed
+                ): Bitmap? {
+                    return null
                 }
+
+                // Optional: You can provide a bitmap for the notification icon
+                // override fun getCurrentLargeIcon(player: Player, callback: PlayerNotificationManager.BitmapCallback): Bitmap? = null
             })
             .setNotificationListener(object : PlayerNotificationManager.NotificationListener {
-                override fun onNotificationPosted(
-                    notificationId: Int,
-                    notification: Notification,
-                    ongoing: Boolean // True if playback is active and notification shouldn't be dismissed
-                ) {
-                    if (ongoing) {
-                        // Playback is active, notification should be ongoing.
-                        // Make the service a foreground service.
+                override fun onNotificationPosted(notificationId: Int, notification: Notification, ongoing: Boolean) {
+                    if (ongoing && !isServiceCurrentlyInForeground) {
+                        ContextCompat.startForegroundService(
+                            applicationContext,
+                            Intent(applicationContext, this@MusicService.javaClass)
+                        )
                         startForeground(notificationId, notification)
-                        isServiceInForeground = true
-                    } else {
-                        // Playback is not active (e.g., paused), notification can be dismissed.
-                        // If the service is in foreground, remove it from foreground
-                        // but keep the notification (so it can be swiped away).
-                        if (isServiceInForeground) {
-                            stopForeground(false) // false = don't remove notification yet
-                            isServiceInForeground = false
-                        }
+                        isServiceCurrentlyInForeground = true
+                    } else if (!ongoing && isServiceCurrentlyInForeground) {
+                        stopForeground(STOP_FOREGROUND_REMOVE) // Or STOP_FOREGROUND_DETACH
+                        isServiceCurrentlyInForeground = false
                     }
                 }
 
                 override fun onNotificationCancelled(notificationId: Int, dismissedByUser: Boolean) {
-                    // Called when notification is dismissed (e.g., user swipes it away)
-                    // or when stopForeground(true) is called.
-                    if (dismissedByUser) {
-                        stopSelf() // Stop the service if the user dismissed the notification
-                    }
-                    isServiceInForeground = false // No longer in foreground
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    isServiceCurrentlyInForeground = false
+                    stopSelf() // Stop the service if the notification is dismissed
                 }
             })
+            .setChannelNameResourceId(R.string.notification_channel_name) // Name for user settings
+            .setChannelDescriptionResourceId(R.string.notification_channel_description) // Description for user settings
             .build().apply {
-                setPlayer(this@MusicService.player)
-                setMediaSessionToken(this@MusicService.mediaSession?.sessionCompatToken!!)
+                setPlayer(exoPlayer)
+                setMediaSessionToken(mediaSession?.sessionCompatToken!!)
                 setUseNextActionInCompactView(true)
                 setUsePreviousActionInCompactView(true)
-                // setSmallIcon(R.drawable.ic_notification_icon) // Set your small icon
+                setUseStopAction(false) // Using pause/play instead of stop
+                setPriority(NotificationCompat.PRIORITY_LOW) // For ongoing media
             }
     }
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
 
-    private val servicePlayerListener = object : Player.Listener {
-        // Player listener callbacks (onIsPlayingChanged, onPlaybackStateChanged)
-        // PlayerNotificationManager usually handles most updates based on these.
-        // If you had manual notification updates here, you'd call:
-        // val notification = buildMyNotification()
-        // val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        // notificationManager.notify(YOUR_NOTIFICATION_ID, notification)
-        // And then manage startForeground/stopForeground based on isPlaying.
-    }
-
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        if (player.isPlaying || player.playbackState != Player.STATE_IDLE) {
-            player.stop()
-        }
-        player.clearMediaItems()
-        stopSelf() // Stop the service
-        isServiceInForeground = false
-        super.onTaskRemoved(rootIntent)
-    }
-
-    override fun onDestroy() {
-        mediaSession?.release()
-        playerNotificationManager?.setPlayer(null)
-        player.release()
-        isServiceInForeground = false
-        super.onDestroy()
-    }
-
-    private fun createNotificationChannel() {
+    private fun createNotificationChannelIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = getString(R.string.notification_channel_name)
             val descriptionText = getString(R.string.notification_channel_description)
-            val importance = android.app.NotificationManager.IMPORTANCE_LOW // Use LOW to prevent sound on notification
-            val channel =
-                android.app.NotificationChannel(YOUR_NOTIFICATION_CHANNEL_ID, name, importance).apply {
-                    description = descriptionText
-                }
-            val notificationManager: android.app.NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+            val importance = NotificationManager.IMPORTANCE_LOW // Low importance for media playback
+            val channel = NotificationChannel(PLAYBACK_NOTIFICATION_CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+                // Configure other channel properties here if needed (e.g., sound, vibration)
+                setSound(null, null) // No sound for the notification itself, only for playback
+                enableVibration(false)
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
-    // This is part of MediaSessionService. PlayerNotificationManager's NotificationListener
-    // is the more modern way to handle when startForeground should be called for Media3.
-    // However, if you *must* implement it or are not solely relying on PlayerNotificationManager
-    // for foreground decisions:
-    /*
-    override fun onUpdateNotification(session: MediaSession, startInForegroundRequired: Boolean) {
-        // This callback from MediaSessionService tells you if the session thinks it needs to be foreground.
-        if (startInForegroundRequired && !isServiceInForeground) {
-            // You would typically get the notification from PlayerNotificationManager or build it
-            // val notification = playerNotificationManager?.getNotification() ?: buildMyOwnNotification()
-            // startForeground(YOUR_NOTIFICATION_ID, notification)
-            // isServiceInForeground = true
-        } else if (!startInForegroundRequired && isServiceInForeground) {
-            // stopForeground(false)
-            // isServiceInForeground = false
+    private val internalPlayerListener = object : Player.Listener {
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            if (playbackState == Player.STATE_ENDED || playbackState == Player.STATE_IDLE) {
+                if (isServiceCurrentlyInForeground) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    isServiceCurrentlyInForeground = false
+                }
+                // Optionally stop the service if the playlist ends and nothing is playing
+                // if (!exoPlayer.playWhenReady && exoPlayer.mediaItemCount == 0) {
+                // stopSelf()
+                // }
+            }
+        }
+
+        override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+            if (!playWhenReady) {
+                // If paused and if configured, allow the service to be stopped if notification is swiped away
+                // This is handled by onNotificationCancelled and the foreground service logic.
+                // However, if not in foreground, and paused, consider stopping self after a delay.
+                if (!isServiceCurrentlyInForeground) {
+                    // stopSelf() // Consider with a delay if desired
+                }
+            }
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            // This is where you manage the foreground service lifecycle based on playback.
+            // PlayerNotificationManager handles a lot of this, but you can add custom logic.
+            if (!isPlaying && exoPlayer.playbackState != Player.STATE_BUFFERING) {
+                // Player is paused or stopped, and not just buffering
+                if (isServiceCurrentlyInForeground) {
+                    // If you want the service to stop immediately when paused and notification is removed,
+                    // PlayerNotificationManager's onNotificationCancelled will handle stopSelf.
+                    // If you want to keep it alive for a while after pausing:
+                    // stopForeground(STOP_FOREGROUND_DETACH); // Detaches notification, service still runs
+                    // isServiceInForeground = false;
+                    // Then use a Handler to stopSelf() after a timeout if playback doesn't resume.
+                }
+            }
         }
     }
-    */
+
+    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? = mediaSession
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        if (!exoPlayer.isPlaying && !isServiceCurrentlyInForeground) {
+            stopSelf() // Stop service if app is swiped away and not playing
+        }
+        super.onTaskRemoved(rootIntent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaSession?.run {
+            player.release() // Release ExoPlayer
+            release()       // Release MediaSession
+            mediaSession = null
+        }
+        playerNotificationManager?.setPlayer(null) // Detach player from notification manager
+    }
 }
