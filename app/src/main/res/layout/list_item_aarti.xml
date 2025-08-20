@@ -15,14 +15,30 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
+        <!-- ImageView for the "Now Playing" icon -->
+        <ImageView
+            android:id="@+id/imageViewPlayingIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@string/currently_playing_indicator"
+            app:tint="?attr/colorSecondaryVariant"
+            android:src="@drawable/avd_play_indicator"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible"/>
+
         <CheckBox
             android:id="@+id/checkboxAarti"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:buttonTint="@color/aarti_checkbox_tint"
+            android:visibility="invisible"/>
 
         <TextView
             android:id="@+id/textViewAartiTitle"
@@ -43,7 +59,7 @@
             android:contentDescription="Drag to reorder"
             android:padding="8dp"
             android:src="@drawable/ic_drag_handle"
-            app:tint="?attr/colorControlNormal"
+            app:tint="?attr/colorSecondaryVariant"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>

@@ -1,0 +1,13 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_play_indicator"
+    android:tint="?attr/colorSecondaryVariant">
+    <target
+        android:name="bar1"
+        android:animation="@animator/avd_equalizer_bar1_anim" />
+    <target
+        android:name="bar2"
+        android:animation="@animator/avd_equalizer_bar_anim" />
+    <target
+        android:name="bar3"
+        android:animation="@animator/avd_equalizer_bar3_anim" />
+</animated-vector>

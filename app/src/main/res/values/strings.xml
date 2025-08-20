@@ -39,4 +39,5 @@
         <string name="ok">OK</string>
         <string name="please_select_aarti_to_play">Please select an Aarti to play.</string>
         <string name="select_aarti_and_noti_perm_reminder">Please select an Aarti. Note: Notification controls require permission.</string>
+    <string name="currently_playing_indicator">Current playing</string>
 </resources>

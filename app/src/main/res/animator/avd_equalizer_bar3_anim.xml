@@ -1,0 +1,11 @@
+<objectAnimator
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:propertyName="pathData"
+    android:duration="500"
+    android:valueFrom="M16,18 L16,14 L18,14 L18,18 L16,18 Z"
+    android:valueTo="M16,18 L16,8 L18,8 L18,18 L16,18 Z"
+    android:valueType="pathType"
+    android:repeatCount="infinite"
+    android:repeatMode="reverse"
+    android:startOffset="50"
+    android:interpolator="@android:interpolator/bounce" />
