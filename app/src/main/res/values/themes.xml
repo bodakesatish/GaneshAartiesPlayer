@@ -2,33 +2,33 @@
     <!-- Base application theme. -->
     <style name="Theme.GaneshAartiesPlayer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary Orange Brand Color. -->
-        <item name="colorPrimary">@color/orange_primary_light</item>
-        <item name="colorPrimaryVariant">@color/orange_primary_variant_light</item>
-        <item name="colorOnPrimary">@color/on_orange_primary_light</item>
+        <item name="colorPrimary">@color/orange_primary</item>
+        <item name="colorPrimaryVariant">@color/orange_primary_variant</item>
+        <item name="colorOnPrimary">@color/on_orange_primary</item>
 
         <!-- Secondary Orange Brand Color (optional, if you use it). -->
-        <item name="colorSecondary">@color/orange_secondary_light</item>
-        <item name="colorSecondaryVariant">@color/orange_primary_variant_light</item> <!-- Can reuse primary variant -->
-        <item name="colorOnSecondary">@color/on_orange_secondary_light</item>
+        <item name="colorSecondary">@color/orange_secondary</item>
+        <item name="colorSecondaryVariant">@color/orange_primary_variant</item> <!-- Can reuse primary variant -->
+        <item name="colorOnSecondary">@color/on_orange_secondary</item>
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
         <!-- Background and Surface Colors -->
-        <item name="android:colorBackground">@color/light_gray_background</item> <!-- Or @color/white -->
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnBackground">@color/dark_gray_text</item>
-        <item name="colorOnSurface">@color/dark_gray_text</item>
+        <item name="android:colorBackground">@color/surface_background</item> <!-- Or @color/white -->
+        <item name="colorSurface">@color/medium_surface</item>
+        <item name="colorOnBackground">@color/text_on</item>
+        <item name="colorOnSurface">@color/text_on</item>
         <item name="colorError">#B00020</item> <!-- Standard Material Error Color -->
         <item name="colorOnError">@color/white</item>
 
         <!-- Specific List Item Colors (using theme attributes for better flexibility) -->
-        <item name="listItemPlayingBackground">@color/list_item_playing_background_light</item>
-        <item name="listItemPlayingText">@color/list_item_playing_text_light</item>
-        <item name="listItemSelectorBackground">@color/list_item_selected_background_light</item>
-        <item name="listItemSelectorText">@color/list_item_selected_text_light</item>
-        <item name="listItemDefaultBackground">@color/list_item_default_background_light</item>
-        <item name="listItemDefaultText">@color/list_item_default_text_light</item>
+        <item name="listItemPlayingBackground">@color/list_item_playing_background</item>
+        <item name="listItemPlayingText">@color/list_item_playing_text</item>
+        <item name="listItemSelectorBackground">@color/list_item_selected_background</item>
+        <item name="listItemSelectorText">@color/list_item_selected_text</item>
+        <item name="listItemDefaultBackground">@color/list_item_default_background</item>
+        <item name="listItemDefaultText">@color/list_item_default_text</item>
 
         <!-- Customize your theme here. -->
     </style>

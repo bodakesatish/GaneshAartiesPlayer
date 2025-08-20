@@ -2,36 +2,43 @@
 <resources>
     <!-- Orange Palette - Light Theme (Examples) -->
     <!-- You can use Material Color Tool to pick these: https://material.io/resources/color/ -->
-    <color name="orange_primary_light">#FF9800</color>   <!-- Orange 500 -->
-    <color name="orange_primary_variant_light">#F57C00</color> <!-- Orange 700 -->
-    <color name="orange_secondary_light">#FFC107</color> <!-- Amber 500 (example, if you need a secondary) -->
+    <color name="orange_primary">#FF9800</color>   <!-- Orange 500 -->
+    <color name="orange_primary_variant">#F57C00</color> <!-- Orange 700 -->
+    <color name="orange_secondary">#FFC107</color> <!-- Amber 500 (example, if you need a secondary) -->
 
     <!-- Text/Icon Colors on Oranges - Light Theme -->
-    <color name="on_orange_primary_light">#FFFFFF</color>       <!-- White text on primary orange -->
-    <color name="on_orange_secondary_light">#000000</color>     <!-- Black text on secondary orange (amber) -->
+    <color name="on_orange_primary">#FFFFFF</color>       <!-- White text on primary orange -->
+    <color name="on_orange_secondary">#000000</color>     <!-- Black text on secondary orange (amber) -->
 
     <!-- Standard Neutrals (can be shared or overridden) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="light_gray_background">#F5F5F5</color> <!-- A light grey for general backgrounds -->
+    <color name="surface_background">#F5F5F5</color>      <!-- Standard dark surface -->
+    <color name="medium_surface">#FFFFFF</color>       <!-- Slightly lighter dark surface -->
+    <color name="text_on">#212121</color>          <!-- Light grey for text on dark surfaces -->
+    <color name="medium_text_on">#BDBDBD</color>        <!-- Medium grey for text on dark -->
+
+<!--    <color name="light_gray_background">#F5F5F5</color> &lt;!&ndash; A light grey for general backgrounds &ndash;&gt;-->
     <color name="medium_gray_text">#757575</color>    <!-- For less prominent text -->
     <color name="dark_gray_text">#212121</color>      <!-- For primary text on light backgrounds -->
 
     <!-- Semantic Colors for List Items (Light Theme) -->
     <!-- These will be referenced by your theme attributes or directly -->
-    <color name="list_item_playing_background_light">#FF9800</color> <!-- Light Orange (e.g., Orange 100/200) -->
-    <color name="list_item_playing_text_light">@color/black</color> <!-- Or a dark orange/brown -->
+    <color name="list_item_playing_background">#FF9800</color> <!-- Light Orange (e.g., Orange 100/200) -->
+    <color name="list_item_playing_text">@color/orange_primary_variant</color> <!-- Or a dark orange/brown -->
 
-    <color name="list_item_selected_background_light">#FFCC80</color> <!-- Medium Orange (e.g., Orange 200/300) -->
-    <color name="list_item_selected_text_light">@color/black</color>
+    <color name="list_item_selected_background">#FFCC80</color> <!-- Medium Orange (e.g., Orange 200/300) -->
+    <color name="list_item_selected_text">@color/black</color>
 
-    <color name="list_item_default_background_light">@color/white</color>
-    <color name="list_item_default_text_light">@color/dark_gray_text</color>
+    <color name="list_item_default_background">@color/white</color>
+    <color name="list_item_default_text">@color/dark_gray_text</color>
 
     <color name="transparent">#00000000</color>
 
+    <color name="aarti_checkbox_tint">#F57C00</color>
+
     <!-- Deprecated/Old (Remove or map if still used somewhere directly, then refactor) -->
-    <!-- <color name="purple_200">#FFBB86FC</color> ... and other purples/teals -->
-    <!-- <color name="aarti_item_playing_background_dark">#4A148C</color> ... etc. -->
+     <color name="purple_200">#FFBB86FC</color> ... and other purples/teals
+     <color name="aarti_item_playing_background">#4A148C</color> ... etc.
 
 </resources>

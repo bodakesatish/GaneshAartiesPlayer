@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"> <!-- Or another suitable background -->
     <!-- Apply the style    style="@style/PlayerControlsContainerStyle"
@@ -14,8 +15,10 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
+        android:textSize="18sp"
+        android:textColor="?attr/colorSecondaryVariant"
         tools:text="Current Aarti Name" />
-<!--    android:textAppearance="?attr/textAppearanceTitleMedium"-->
+
 
     <SeekBar
         android:id="@+id/seekBarPlayer"
@@ -32,6 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
+            android:textColor="?attr/colorSecondaryVariant"
             tools:text="00:00" />
 
         <TextView
@@ -39,6 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:textColor="?attr/colorSecondaryVariant"
             tools:text="03:45" />
     </RelativeLayout>
 
@@ -54,6 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:tint="?attr/colorSecondaryVariant"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Previous"
             android:src="@drawable/ic_skip_previous" />
@@ -66,6 +72,7 @@
             android:layout_weight="1"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Play"
+            app:tint="?attr/colorSecondaryVariant"
             android:src="@drawable/ic_play_arrow" />
         <!-- Create this, and ic_pause -->
 
@@ -74,6 +81,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            app:tint="?attr/colorSecondaryVariant"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Next"
             android:src="@drawable/ic_skip_next" />

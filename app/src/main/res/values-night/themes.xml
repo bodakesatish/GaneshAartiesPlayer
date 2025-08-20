@@ -2,33 +2,33 @@
     <!-- Base application theme for Dark Mode. -->
     <style name="Theme.GaneshAartiesPlayer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary Orange Brand Color. -->
-        <item name="colorPrimary">@color/orange_primary_dark</item>
-        <item name="colorPrimaryVariant">@color/orange_primary_variant_dark</item>
-        <item name="colorOnPrimary">@color/on_orange_primary_dark</item>
+        <item name="colorPrimary">@color/orange_primary</item>
+        <item name="colorPrimaryVariant">@color/orange_primary_variant</item>
+        <item name="colorOnPrimary">@color/on_orange_primary</item>
 
         <!-- Secondary Orange Brand Color (optional). -->
-        <item name="colorSecondary">@color/orange_secondary_dark</item>
-        <item name="colorSecondaryVariant">@color/orange_primary_variant_dark</item> <!-- Can reuse primary variant -->
-        <item name="colorOnSecondary">@color/on_orange_secondary_dark</item>
+        <item name="colorSecondary">@color/orange_secondary</item>
+        <item name="colorSecondaryVariant">@color/orange_primary_variant</item> <!-- Can reuse primary variant -->
+        <item name="colorOnSecondary">@color/on_orange_secondary</item>
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
         <!-- Background and Surface Colors -->
-        <item name="android:colorBackground">@color/dark_surface_background</item>
-        <item name="colorSurface">@color/medium_dark_surface</item> <!-- e.g., for cards -->
-        <item name="colorOnBackground">@color/light_text_on_dark</item>
-        <item name="colorOnSurface">@color/light_text_on_dark</item>
+        <item name="android:colorBackground">@color/surface_background</item>
+        <item name="colorSurface">@color/medium_surface</item> <!-- e.g., for cards -->
+        <item name="colorOnBackground">@color/text_on</item>
+        <item name="colorOnSurface">@color/text_on</item>
         <item name="colorError">#CF6679</item> <!-- Standard Material Error Color for Dark -->
         <item name="colorOnError">@color/black</item>
 
         <!-- Specific List Item Colors (using theme attributes for better flexibility) -->
-        <item name="listItemPlayingBackground">@color/list_item_playing_background_dark</item>
-        <item name="listItemPlayingText">@color/list_item_playing_text_dark</item>
-        <item name="listItemSelectorBackground">@color/list_item_selected_background_dark</item>
-        <item name="listItemSelectorText">@color/list_item_selected_text_dark</item>
-        <item name="listItemDefaultBackground">@color/list_item_default_background_dark</item>
-        <item name="listItemDefaultText">@color/list_item_default_text_dark</item>
+        <item name="listItemPlayingBackground">@color/aarti_item_playing_background</item>
+        <item name="listItemPlayingText">@color/list_item_playing_text</item>
+        <item name="listItemSelectorBackground">@color/list_item_selected_background</item>
+        <item name="listItemSelectorText">@color/list_item_selected_text</item>
+        <item name="listItemDefaultBackground">@color/list_item_default_background</item>
+        <item name="listItemDefaultText">@color/list_item_default_text</item>
 
         <!-- Customize your theme here. -->
     </style>

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "211213438152",
+    "project_id": "apps-94051",
+    "storage_bucket": "apps-94051.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:211213438152:android:3c8f24ada73a18d6c0e9fd",
+        "android_client_info": {
+          "package_name": "com.bodakesatish.apps"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw-B_TpW8bO0ZxylJ4nvGiKhDlMB_ZOEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:211213438152:android:1f2a69c80a4aa13dc0e9fd",
+        "android_client_info": {
+          "package_name": "com.bodakesatish.ganeshaarties"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw-B_TpW8bO0ZxylJ4nvGiKhDlMB_ZOEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

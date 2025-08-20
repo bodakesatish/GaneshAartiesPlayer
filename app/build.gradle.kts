@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -12,7 +13,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,6 +25,24 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            // Customize APK name for release builds
+            applicationVariants.all {
+                val variant = this
+                if (variant.buildType.name == "release") {
+                    variant.outputs.all {
+                        val output = this
+                        if (output is com.android.build.gradle.internal.api.ApkVariantOutputImpl) {
+                            // Example: appName-versionName-versionCode-release.apk
+                            // You can customize this pattern as you like.
+                            val appName = "GaneshAartiesPlayer" // Or use project.name, module name, etc.
+                            output.outputFileName =
+                                "${appName}-v${variant.versionName}-release.apk"
+                        }
+                    }
+                }
+            }
+
         }
     }
     compileOptions {
@@ -48,14 +67,14 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
-    // Media3 ExoPlayer
-    implementation("androidx.media3:media3-exoplayer:1.2.1")
-    implementation("androidx.media3:media3-ui:1.2.1") // For UI components like PlayerControlView if needed, though we'll build custom
-    implementation("androidx.media3:media3-session:1.2.1") // For MediaSessionService
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.session)
 
-    // Add this line:
-    implementation("androidx.media:media:1.7.0") // Or the latest stable version
+    implementation(libs.androidx.media)
+    implementation(libs.firebase.firestore)
 
+    implementation(libs.androidx.datastore.preferences)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

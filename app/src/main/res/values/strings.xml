@@ -26,7 +26,7 @@
         <string name="cancel">Cancel</string>
 
 
-        <string name="theme_menu_title">Theme</string>
+        <string name="theme_selection_title">Theme</string>
         <string name="theme_light">Light</string>
         <string name="theme_dark">Dark</string>
         <string name="theme_system_default">System Default</string>
@@ -39,4 +39,5 @@
         <string name="ok">OK</string>
         <string name="please_select_aarti_to_play">Please select an Aarti to play.</string>
         <string name="select_aarti_and_noti_perm_reminder">Please select an Aarti. Note: Notification controls require permission.</string>
+        <string name="currently_playing_indicator" translatable="false">Current playing</string>
 </resources>

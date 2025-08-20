@@ -1,16 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_change_language"
-        android:title="@string/change_language_menu_title"
-        app:showAsAction="never" />
-
-    <!-- Theme Selection Menu -->
-    <item
-        android:id="@+id/action_theme"
-        android:title="@string/theme_menu_title"
-        app:showAsAction="never">
+    <item android:title="@string/theme_selection_title"> <!-- Optional: Title for the group -->
         <menu>
             <group android:checkableBehavior="single">
                 <item
@@ -25,5 +15,9 @@
             </group>
         </menu>
     </item>
-
+    <item
+        android:id="@+id/action_change_language"
+        android:title="@string/change_language_menu_title"
+        app:showAsAction="never" />
 </menu>
+    

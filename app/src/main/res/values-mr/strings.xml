@@ -15,7 +15,7 @@
     <!-- Aarti Titles (Example) -->
     <string name="sukhakarta_dukhaharta_title">सुखकर्ता दुःखहर्ता</string>
     <string name="durge_durghat_bhari_title">दुर्गे दुर्घट भारी</string>
-    <string name="lavthavati_vikrala_title">लावतावती विक्रला</string>
+    <string name="lavthavati_vikrala_title">लवलवती विक्राला</string>
     <string name="yuge_atthavis_vitthala_title">युगे अठ्ठावीस</string>
     <string name="datta_aarti_title">दत्ताची आरती</string>
     <string name="ghalin_lotangan_vandin_charan_title">घालीन लोटांगण</string>
@@ -27,7 +27,7 @@
     <string name="cancel">रद्द करा</string>
 
 
-    <string name="theme_menu_title">थीम</string>
+    <string name="theme_selection_title">थीम</string>
     <string name="theme_light">लाईट</string>
     <string name="theme_dark">डार्क</string>
     <string name="theme_system_default">सिस्टिम डिफॉल्ट</string>
