@@ -25,4 +25,21 @@
     <string name="change_language_menu_title">भाषा बदला</string>
     <string name="select_language_title">भाषा निवडा</string>
     <string name="cancel">रद्द करा</string>
+
+
+    <string name="theme_menu_title">थीम</string>
+    <string name="theme_light">लाईट</string>
+    <string name="theme_dark">डार्क</string>
+    <string name="theme_system_default">सिस्टिम डिफॉल्ट</string>
+    <string name="language_english">English</string>
+    <string name="language_marathi">मराठी</string>
+
+    <string name="notification_permission_title">सूचना परवानगी आवश्यक आहे</string>
+    <string name="notification_permission_rationale">हे अ‍ॅप मीडिया प्लेबॅक नियंत्रणे आणि चालू ट्रॅक माहिती प्रदर्शित करण्यासाठी सूचना वापरते. कृपया हे वैशिष्ट्य सक्षम करण्याची परवानगी द्या.</string>
+    <string name="notification_permission_denied_message">सूचना परवानगी नाकारली. सूचनांमध्ये प्लेबॅक नियंत्रणे दाखवली जाणार नाहीत.</string>
+    <string name="settings">सेटिंग्ज</string>
+    <string name="ok">ठीक आहे</string>
+    <string name="please_select_aarti_to_play">कृपया वाजवण्यासाठी आरती निवडा.</string>
+    <string name="select_aarti_and_noti_perm_reminder">कृपया आरती निवडा. टीप: सूचना नियंत्रणांना परवानगी आवश्यक आहे.</string>
+
 </resources>

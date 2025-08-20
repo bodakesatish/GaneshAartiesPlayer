@@ -1,6 +1,9 @@
 package com.bodakesatish.ganeshaarties
 
+import androidx.annotation.OptIn
 import androidx.lifecycle.ViewModel
+import androidx.media3.common.util.Log
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -65,6 +68,7 @@ class AartiViewModel : ViewModel() {
         _playerStateFlow.update { it.copy(currentPlaylist = selectedAarties) }
     }
 
+    @OptIn(UnstableApi::class)
     fun setPlayerState(
         isPlaying: Boolean,
         currentAartiId: Int?,
@@ -72,6 +76,7 @@ class AartiViewModel : ViewModel() {
         durationMs: Long
     ) {
         val currentAarti = _aartiItemsFlow.value.find { it.id == currentAartiId }
+        Log.d("ViewModel", "setPlayerState: isPlaying=$isPlaying, aartiId=$currentAartiId, pos=$positionMs, newAartiTitle=${currentAarti?.title}")
         _playerStateFlow.update {
             it.copy(
                 isPlaying = isPlaying,

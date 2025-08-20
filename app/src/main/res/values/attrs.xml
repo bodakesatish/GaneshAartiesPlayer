@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Custom Attributes for Aarti List Item States -->
-    <attr name="myListItemPlayingBackgroundColor" format="color" />
-    <attr name="myListItemPlayingTextColor" format="color" />
-    <attr name="myListItemSelectedBackgroundColor" format="color" />
-    <attr name="myListItemSelectedTextColor" format="color" />
-    <attr name="myListItemBackgroundColor" format="color" />
-    <attr name="myPrimaryTextColor" format="color" />
-    <attr name="myIconTintColor" format="color" />
+    <attr name="listItemPlayingBackground" format="color" />
+    <attr name="listItemPlayingText" format="color" />
+    <attr name="listItemSelectorBackground" format="color" />
+    <attr name="listItemSelectorText" format="color" />
+    <attr name="listItemDefaultBackground" format="color" />
+    <attr name="listItemDefaultText" format="color" />
 </resources>

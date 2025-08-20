@@ -91,17 +91,17 @@ class AartiAdapter(private val listener: AartiInteractionListener) :
 
             when {
                 isCurrentlyPlaying -> {
-                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.myListItemPlayingTextColor, Color.BLACK))
-                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.myListItemPlayingBackgroundColor, Color.LTGRAY))
+                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.listItemPlayingText, Color.BLACK))
+                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.listItemPlayingBackground, Color.LTGRAY))
                 }
                 aarti.isChecked -> {
-                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.myListItemSelectedTextColor, Color.BLACK))
-                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.myListItemSelectedBackgroundColor, Color.DKGRAY))
+                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.listItemSelectorText, Color.BLACK))
+                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.listItemSelectorBackground, Color.DKGRAY))
                 }
                 else -> {
                     // Reset to theme defaults using your custom attributes
-                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.myPrimaryTextColor, Color.BLACK))
-                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.myListItemBackgroundColor, Color.TRANSPARENT))
+                    binding.textViewAartiTitle.setTextColor(MaterialColors.getColor(context, R.attr.listItemDefaultText, Color.BLACK))
+                    binding.root.setBackgroundColor(MaterialColors.getColor(context, R.attr.listItemDefaultBackground, Color.TRANSPARENT))
 
                 }
             }

@@ -5,4 +5,25 @@
         android:id="@+id/action_change_language"
         android:title="@string/change_language_menu_title"
         app:showAsAction="never" />
+
+    <!-- Theme Selection Menu -->
+    <item
+        android:id="@+id/action_theme"
+        android:title="@string/theme_menu_title"
+        app:showAsAction="never">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/action_theme_light"
+                    android:title="@string/theme_light" />
+                <item
+                    android:id="@+id/action_theme_dark"
+                    android:title="@string/theme_dark" />
+                <item
+                    android:id="@+id/action_theme_system"
+                    android:title="@string/theme_system_default" />
+            </group>
+        </menu>
+    </item>
+
 </menu>

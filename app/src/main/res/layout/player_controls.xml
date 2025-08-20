@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/PlayerControlsContainerStyle"
     android:orientation="vertical"
     android:padding="16dp"> <!-- Or another suitable background -->
-    <!-- Apply the style -->
+    <!-- Apply the style    style="@style/PlayerControlsContainerStyle"
+ -->
     <TextView
         android:id="@+id/textViewCurrentSong"
         android:layout_width="match_parent"
@@ -14,8 +14,8 @@
         android:ellipsize="end"
         android:gravity="center"
         android:maxLines="1"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
         tools:text="Current Aarti Name" />
+<!--    android:textAppearance="?attr/textAppearanceTitleMedium"-->
 
     <SeekBar
         android:id="@+id/seekBarPlayer"

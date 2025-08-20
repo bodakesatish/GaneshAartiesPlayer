@@ -1,41 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Neutral Colors - Dark Theme (some can be reused from light if they are absolute like black/white) -->
-    <!-- <color name="neutral_black">#FF000000</color> --> <!-- Already in base values/colors.xml -->
-    <!-- <color name="neutral_white">#FFFFFFFF</color> --> <!-- Already in base values/colors.xml -->
-    <color name="neutral_grey_dark_background">#FF121212</color> <!-- Standard dark surface -->
-    <color name="neutral_text_light_on_dark">#E0E0E0</color>   <!-- Grey 200/300 for text -->
+    <!-- Orange Palette - Dark Theme (Examples - often lighter/more vibrant) -->
+    <color name="orange_primary_dark">#FF222222</color>    <!-- Orange 300 -->
+    <color name="orange_primary_variant_dark">#FFA726</color> <!-- Orange 400 -->
+    <color name="orange_secondary_dark">#FFCA28</color>  <!-- Amber 300 (example) -->
 
-    <!-- Primary Orange Palette - Dark Theme Adjustments if needed -->
-    <!-- Often, the base primary colors are used, but lighter shades might be emphasized for primary actions -->
-    <color name="orange_primary_dark_theme">#FFB74D</color> <!-- Orange 300 - lighter for dark theme primary -->
-    <color name="orange_accent_dark_theme">#FFCC80</color>  <!-- Orange 200 - for accents on dark -->
+    <!-- Text/Icon Colors on Oranges - Dark Theme -->
+    <color name="on_orange_primary_dark">#FFFFFFFF</color>        <!-- Black text on lighter primary orange -->
+    <color name="on_orange_secondary_dark">#000000</color>      <!-- Black text on lighter secondary orange -->
 
+    <!-- Standard Neutrals - Dark Theme -->
+    <color name="dark_surface_background">#FF121212</color>      <!-- Standard dark surface -->
+    <color name="medium_dark_surface">#FF222222</color>       <!-- Slightly lighter dark surface -->
+    <color name="light_text_on_dark">#E0E0E0</color>          <!-- Light grey for text on dark surfaces -->
+    <color name="medium_text_on_dark">#BDBDBD</color>        <!-- Medium grey for text on dark -->
 
-    <!-- UI Element Specific Colors - Dark Theme -->
-    <color name="list_item_playing_background_dark">#FFAB40</color> <!-- Orange A200 (Vibrant) -->
+    <!-- Semantic Colors for List Items (Dark Theme) -->
+    <color name="list_item_playing_background_dark">#FB8C00</color>  <!-- Vibrant Orange (e.g., Orange 400) -->
     <color name="list_item_playing_text_dark">@color/black</color>
 
-    <color name="list_item_selected_background_dark">#5D4037</color> <!-- Brown 700 (Darker, less saturated orange/brown) -->
-    <color name="list_item_selected_text_dark">#FFCC80</color>     <!-- Orange 200 -->
+    <color name="list_item_selected_background_dark">#FFA726</color> <!-- Darker/Saturated Orange (e.g., Orange 600) -->
+    <color name="list_item_selected_text_dark">@color/black</color> <!-- Or white if the orange is dark enough -->
 
-    <color name="list_item_default_background_dark">#2C2C2C</color> <!-- Slightly lighter than pure black for items -->
-    <color name="list_item_default_text_dark">@color/neutral_text_light_on_dark</color>
-    <color name="your_dark_surface_variant_color">#C71212</color> <!-- Example: Darker grey -->
-    <color name="your_dark_on_surface_variant_color">#BDBDBD</color> <!-- Example: Light grey for text/icons -->
-    <color name="list_item_selected_background_light">#262526</color> <!-- Orange 50 -->
+    <color name="list_item_default_background_dark">@color/medium_dark_surface</color> <!-- Darker than pure black -->
+    <color name="list_item_default_text_dark">@color/light_text_on_dark</color>
 
-    <!-- Deprecating old names - ensure they point to new dark theme specifics if used directly in dark layouts -->
-    <!--
-    <color name="playing_text_color">@color/list_item_playing_text_dark</color>
-    <color name="playing_background_color">@color/list_item_playing_background_dark</color>
-    <color name="selected_text_color">@color/list_item_selected_text_dark</color>
-    <color name="selected_background_color">@color/list_item_selected_background_dark</color>
-    <color name="default_text_color">@color/list_item_default_text_dark</color>
-    <color name="light_grey_background">@color/neutral_grey_dark_background</color> comment out if not used for dark
-    <color name="dark_grey_background">@color/neutral_grey_dark_background</color>
-    <color name="light_text_on_dark">@color/neutral_text_light_on_dark</color>
+    <!-- Ensure these are also present if not inherited from base colors.xml -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
 
-    <color name="purple_200">@color/orange_accent_dark_theme</color>
-    -->
 </resources>

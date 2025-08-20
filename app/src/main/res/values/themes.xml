@@ -1,77 +1,35 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme (Light) -->
-    <style name="Theme.GaneshAartiesPlayer" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Material Color Palette -->
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/purple_200</item> <!-- For elements needing less emphasis than primary -->
-        <item name="colorOnPrimaryContainer">@color/purple_700</item>
+    <!-- Base application theme. -->
+    <style name="Theme.GaneshAartiesPlayer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary Orange Brand Color. -->
+        <item name="colorPrimary">@color/orange_primary_light</item>
+        <item name="colorPrimaryVariant">@color/orange_primary_variant_light</item>
+        <item name="colorOnPrimary">@color/on_orange_primary_light</item>
 
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <item name="colorSecondaryContainer">@color/teal_200</item>
-        <item name="colorOnSecondaryContainer">@color/teal_700</item>
+        <!-- Secondary Orange Brand Color (optional, if you use it). -->
+        <item name="colorSecondary">@color/orange_secondary_light</item>
+        <item name="colorSecondaryVariant">@color/orange_primary_variant_light</item> <!-- Can reuse primary variant -->
+        <item name="colorOnSecondary">@color/on_orange_secondary_light</item>
 
-        <item name="colorTertiary">@color/purple_200</item> <!-- Example, can be another accent -->
-        <item name="colorOnTertiary">@color/purple_700</item>
-        <item name="colorTertiaryContainer">@color/purple_500</item>
-        <item name="colorOnTertiaryContainer">@color/white</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
-        <item name="android:colorBackground">@color/white</item>
-        <item name="colorOnBackground">@color/black</item>
-
-        <item name="colorSurface">@color/purple_500</item> <!-- Cards, Dialogs, Sheets , Status Bar-->
-        <item name="colorOnSurface">@color/black</item>
-        <item name="colorSurfaceVariant">#EDEDED</item> <!-- Slightly different surface -->
-        <item name="colorOnSurfaceVariant">@color/black</item> <!-- Text on surfaceVariant -->
-
-        <item name="colorError">#B00020</item>
+        <!-- Background and Surface Colors -->
+        <item name="android:colorBackground">@color/light_gray_background</item> <!-- Or @color/white -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnBackground">@color/dark_gray_text</item>
+        <item name="colorOnSurface">@color/dark_gray_text</item>
+        <item name="colorError">#B00020</item> <!-- Standard Material Error Color -->
         <item name="colorOnError">@color/white</item>
 
-        <item name="android:statusBarColor">?attr/colorPrimary</item>
-        <!-- For edge-to-edge, make status bar transparent and handle insets -->
-        <!-- <item name="android:statusBarColor">@android:color/transparent</item> -->
-        <!-- <item name="android:navigationBarColor">@android:color/transparent</item> -->
+        <!-- Specific List Item Colors (using theme attributes for better flexibility) -->
+        <item name="listItemPlayingBackground">@color/list_item_playing_background_light</item>
+        <item name="listItemPlayingText">@color/list_item_playing_text_light</item>
+        <item name="listItemSelectorBackground">@color/list_item_selected_background_light</item>
+        <item name="listItemSelectorText">@color/list_item_selected_text_light</item>
+        <item name="listItemDefaultBackground">@color/list_item_default_background_light</item>
+        <item name="listItemDefaultText">@color/list_item_default_text_light</item>
 
-        <!-- Custom App Specific Theme Attributes -->
-        <item name="myListItemPlayingBackgroundColor">@color/aarti_item_playing_background_light</item>
-        <item name="myListItemPlayingTextColor">@color/aarti_item_playing_text_light</item>
-        <item name="myListItemSelectedBackgroundColor">@color/aarti_item_selected_background_light</item>
-        <item name="myListItemSelectedTextColor">@color/aarti_item_selected_text_light</item>
-        <item name="myListItemBackgroundColor">@color/aarti_item_default_background_light</item>
-        <item name="myPrimaryTextColor">@color/aarti_item_default_text_light</item>
-
-        <!-- Component Styles -->
-        <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
-        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
-        <!-- Add other component styles here -->
-
-        <!-- Ensure text inputs have appropriate styling for Material 3 -->
-        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
-
-        <!-- Ensure light themes to make status bar icons dark -->
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <!-- Customize your theme here. -->
     </style>
-
-    <!-- Toolbar Style -->
-    <style name="Widget.App.Toolbar" parent="Widget.Material3.Toolbar.Surface">
-        <item name="android:background">?attr/colorPrimary</item> <!-- Or colorPrimary for a colored toolbar -->
-        <item name="titleTextColor">?attr/colorPrimary</item>
-        <item name="navigationIconTint">?attr/colorPrimary</item>
-        <item name="menu">@menu/main_menu</item> <!-- If you want menu items to inherit tint -->
-    </style>
-
-    <!-- CardView Style (Example) -->
-    <style name="Widget.App.CardView" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardElevation">4dp</item>
-        <item name="cardBackgroundColor">?attr/colorSurface</item>
-    </style>
-
-    <!-- Specific style for player controls if needed, inheriting from a base Material style -->
-    <style name="PlayerControlsContainerStyle">
-        <item name="android:background">?attr/colorSurfaceVariant</item>
-        <item name="android:padding">8dp</item>
-    </style>
-
 </resources>

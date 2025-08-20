@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material Baseline Colors (Light Theme - example) -->
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <!-- Orange Palette - Light Theme (Examples) -->
+    <!-- You can use Material Color Tool to pick these: https://material.io/resources/color/ -->
+    <color name="orange_primary_light">#FF9800</color>   <!-- Orange 500 -->
+    <color name="orange_primary_variant_light">#F57C00</color> <!-- Orange 700 -->
+    <color name="orange_secondary_light">#FFC107</color> <!-- Amber 500 (example, if you need a secondary) -->
+
+    <!-- Text/Icon Colors on Oranges - Light Theme -->
+    <color name="on_orange_primary_light">#FFFFFF</color>       <!-- White text on primary orange -->
+    <color name="on_orange_secondary_light">#000000</color>     <!-- Black text on secondary orange (amber) -->
+
+    <!-- Standard Neutrals (can be shared or overridden) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="light_gray">#D3D3D3</color> <!-- Example for playing background -->
-    <color name="dark_gray">#A9A9A9</color> <!-- Example for selected background -->
+    <color name="light_gray_background">#F5F5F5</color> <!-- A light grey for general backgrounds -->
+    <color name="medium_gray_text">#757575</color>    <!-- For less prominent text -->
+    <color name="dark_gray_text">#212121</color>      <!-- For primary text on light backgrounds -->
+
+    <!-- Semantic Colors for List Items (Light Theme) -->
+    <!-- These will be referenced by your theme attributes or directly -->
+    <color name="list_item_playing_background_light">#FF9800</color> <!-- Light Orange (e.g., Orange 100/200) -->
+    <color name="list_item_playing_text_light">@color/black</color> <!-- Or a dark orange/brown -->
+
+    <color name="list_item_selected_background_light">#FFCC80</color> <!-- Medium Orange (e.g., Orange 200/300) -->
+    <color name="list_item_selected_text_light">@color/black</color>
+
+    <color name="list_item_default_background_light">@color/white</color>
+    <color name="list_item_default_text_light">@color/dark_gray_text</color>
+
     <color name="transparent">#00000000</color>
 
-    <!-- App Specific Semantic Colors (Consider if these need to be fixed or theme-dependent) -->
-    <!-- For Aarti List Items -->
-    <color name="aarti_item_playing_background_light">#9FA8DA</color> <!-- Slightly off-white -->
-    <color name="aarti_item_playing_text_light">@color/purple_700</color> <!-- Your primary dark, for instance -->
-    <color name="aarti_item_selected_background_light">#C5CAE9</color> <!-- A muted primary-related color -->
-    <color name="aarti_item_selected_text_light">@color/black</color>
-
-    <color name="aarti_item_playing_background_dark">#4A148C</color> <!-- Darker variant of purple for dark theme -->
-    <color name="aarti_item_playing_text_dark">@color/purple_200</color> <!-- Lighter purple for dark theme -->
-    <color name="aarti_item_selected_background_dark">#3F51B5</color> <!-- A muted primary-related color for dark -->
-    <color name="aarti_item_selected_text_dark">@color/white</color>
-
-    <color name="aarti_item_default_background_light">@color/white</color>
-    <color name="aarti_item_default_text_light">@color/black</color>
-    <color name="aarti_item_default_background_dark">@color/black</color> <!-- Or a very dark gray -->
-    <color name="aarti_item_default_text_dark">@color/white</color>
+    <!-- Deprecated/Old (Remove or map if still used somewhere directly, then refactor) -->
+    <!-- <color name="purple_200">#FFBB86FC</color> ... and other purples/teals -->
+    <!-- <color name="aarti_item_playing_background_dark">#4A148C</color> ... etc. -->
 
 </resources>

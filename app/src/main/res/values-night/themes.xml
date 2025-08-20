@@ -1,56 +1,35 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme (Dark) -->
-    <style name="Theme.GaneshAartiesPlayer" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Material Color Palette (Dark Theme Overrides) -->
-        <item name="colorPrimary">@color/purple_200</item> <!-- Lighter primary for dark theme -->
-        <item name="colorPrimaryVariant">@color/purple_700</item> <!-- Can remain dark or be adjusted -->
-        <item name="colorOnPrimary">@color/black</item> <!-- Text on light primary -->
-        <item name="colorPrimaryContainer">@color/purple_700</item>
-        <item name="colorOnPrimaryContainer">@color/purple_200</item>
+    <!-- Base application theme for Dark Mode. -->
+    <style name="Theme.GaneshAartiesPlayer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary Orange Brand Color. -->
+        <item name="colorPrimary">@color/orange_primary_dark</item>
+        <item name="colorPrimaryVariant">@color/orange_primary_variant_dark</item>
+        <item name="colorOnPrimary">@color/on_orange_primary_dark</item>
 
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <item name="colorSecondaryContainer">@color/teal_700</item>
-        <item name="colorOnSecondaryContainer">@color/teal_200</item>
+        <!-- Secondary Orange Brand Color (optional). -->
+        <item name="colorSecondary">@color/orange_secondary_dark</item>
+        <item name="colorSecondaryVariant">@color/orange_primary_variant_dark</item> <!-- Can reuse primary variant -->
+        <item name="colorOnSecondary">@color/on_orange_secondary_dark</item>
 
-        <item name="colorTertiary">@color/purple_500</item>
-        <item name="colorOnTertiary">@color/white</item>
-        <item name="colorTertiaryContainer">@color/purple_200</item>
-        <item name="colorOnTertiaryContainer">@color/purple_700</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
 
-        <item name="android:colorBackground">@color/black</item> <!-- Common dark theme background -->
-        <item name="colorOnBackground">@color/white</item>
-
-        <item name="colorSurface">@color/purple_200</item> <!-- Standard dark surface color -->
-        <item name="colorOnSurface">@color/white</item>
-        <item name="colorSurfaceVariant">#2C2C2C</item> <!-- Slightly different dark surface -->
-        <item name="colorOnSurfaceVariant">@color/white</item>
-
-        <item name="colorError">#CF6679</item> <!-- Lighter error for dark theme -->
+        <!-- Background and Surface Colors -->
+        <item name="android:colorBackground">@color/dark_surface_background</item>
+        <item name="colorSurface">@color/medium_dark_surface</item> <!-- e.g., for cards -->
+        <item name="colorOnBackground">@color/light_text_on_dark</item>
+        <item name="colorOnSurface">@color/light_text_on_dark</item>
+        <item name="colorError">#CF6679</item> <!-- Standard Material Error Color for Dark -->
         <item name="colorOnError">@color/black</item>
 
-        <item name="android:statusBarColor">?attr/colorSurface</item> <!-- Match dark surface -->
-        <!-- <item name="android:statusBarColor">@android:color/transparent</item> -->
-        <!-- <item name="android:navigationBarColor">@android:color/transparent</item> -->
+        <!-- Specific List Item Colors (using theme attributes for better flexibility) -->
+        <item name="listItemPlayingBackground">@color/list_item_playing_background_dark</item>
+        <item name="listItemPlayingText">@color/list_item_playing_text_dark</item>
+        <item name="listItemSelectorBackground">@color/list_item_selected_background_dark</item>
+        <item name="listItemSelectorText">@color/list_item_selected_text_dark</item>
+        <item name="listItemDefaultBackground">@color/list_item_default_background_dark</item>
+        <item name="listItemDefaultText">@color/list_item_default_text_dark</item>
 
-        <!-- Custom App Specific Theme Attributes (Dark Theme Overrides) -->
-        <item name="myListItemPlayingBackgroundColor">@color/aarti_item_playing_background_dark</item>
-        <item name="myListItemPlayingTextColor">@color/aarti_item_playing_text_dark</item>
-        <item name="myListItemSelectedBackgroundColor">@color/aarti_item_selected_background_dark</item>
-        <item name="myListItemSelectedTextColor">@color/aarti_item_selected_text_dark</item>
-        <item name="myListItemBackgroundColor">@color/aarti_item_default_background_dark</item>
-        <item name="myPrimaryTextColor">@color/aarti_item_default_text_dark</item>
-
-        <!-- Component Styles (can inherit from light or be overridden) -->
-        <item name="toolbarStyle">@style/Widget.App.Toolbar</item> <!-- Will use dark theme attributes -->
-        <item name="materialCardViewStyle">@style/Widget.App.CardView</item>
-        <item name="textInputStyle">@style/Widget.Material3.TextInputLayout.OutlinedBox</item>
-
-        <!-- Ensure dark themes to make status bar icons light -->
-        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+        <!-- Customize your theme here. -->
     </style>
-
-    <!-- You can override Widget.App.Toolbar specifically for dark if needed,
-         but often the base style with theme attributes is sufficient. -->
-
 </resources>
